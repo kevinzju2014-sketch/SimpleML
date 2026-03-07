@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SimpleML</RootNamespace>
+    <AssemblyName>SimpleML</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Grasshopper">
+      <HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GH_IO">
+      <HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RhinoCommon">
+      <HintPath>C:\Program Files\Rhino 8\System\RhinoCommon.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\**\*.py" />
+  </ItemGroup>
+
+  <!-- 图标资源 -->
+  <ItemGroup>
+    <EmbeddedResource Include="icons\*.png" />
+  </ItemGroup>
+
+  <!-- 确保在构建后自动创建GHA文件（适用于所有配置） -->
+  <Target Name="CreateGHA" AfterTargets="Build" Condition="'$(TargetPath)' != ''">
+    <PropertyGroup>
+      <GhaFilePath>$(TargetDir)$(AssemblyName).gha</GhaFilePath>
+    </PropertyGroup>
+    
+    <!-- 检查 DLL 文件是否存在 -->
+    <Error Condition="!Exists('$(TargetPath)')" Text="错误: 找不到构建输出文件 $(TargetPath)" />
+    
+    <!-- 复制 DLL 为 GHA 文件 -->
+    <Copy SourceFiles="$(TargetPath)" 
+          DestinationFiles="$(GhaFilePath)" 
+          SkipUnchangedFiles="false"
+          ContinueOnError="false" />
+    
+    <!-- 验证文件是否创建成功 -->
+    <Error Condition="!Exists('$(GhaFilePath)')" Text="错误: GHA文件创建失败: $(GhaFilePath)" />
+    
+    <Message Text="========================================" Importance="high" />
+    <Message Text="GHA文件已成功创建！" Importance="high" />
+    <Message Text="位置: $(GhaFilePath)" Importance="high" />
+    <Message Text="========================================" Importance="high" />
+  </Target>
+  
+  <!-- 备用方法：使用 PostBuild 事件 -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetPath)' != ''">
+    <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)$(AssemblyName).gha&quot;" 
+          ContinueOnError="true" 
+          IgnoreExitCode="true" />
+  </Target>
+
+</Project>

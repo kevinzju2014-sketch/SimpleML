@@ -1,0 +1,297 @@
+using System;
+using System.IO;
+using System.Collections.Generic;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+using SimpleML.Core;
+using Rhino;
+
+namespace SimpleML.Components.ModelPrediction
+{
+    public class PredictRegressorComponent : GH_Component
+    {
+        public PredictRegressorComponent()
+          : base("Predict Regressor", "PredictReg",
+              "使用训练好的回归模型进行预测",
+              "SimpleML", "06 Prediction")
+        {
+        }
+
+        public override GH_Exposure Exposure => GH_Exposure.primary;
+
+        protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
+        {
+            pManager.AddGenericParameter("Model", "M", "训练好的回归模型对象（Generic类型）", GH_ParamAccess.item);
+            pManager.AddGenericParameter("X", "X", "待预测的特征数据（Tree结构）", GH_ParamAccess.tree);
+        }
+
+        protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
+        {
+            pManager.AddGenericParameter("Predictions", "P", "预测结果（Tree结构，每个分支包含一个预测值）", GH_ParamAccess.tree);
+            pManager.AddTextParameter("Readme", "R", "组件使用说明", GH_ParamAccess.item);
+        }
+
+        protected override void SolveInstance(IGH_DataAccess DA)
+        {
+            object modelObj = null;
+            GH_Structure<IGH_Goo> xTree = null;
+
+            if (!DA.GetData(0, ref modelObj)) return;
+            if (!DA.GetDataTree(1, out xTree) || xTree == null || xTree.PathCount == 0)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "必须提供X输入（特征数据）");
+                return;
+            }
+
+            try
+            {
+                string mymlPath = GetMyMLPath();
+                if (string.IsNullOrEmpty(mymlPath))
+                {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
+                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                    return;
+                }
+
+                string modelStr = modelObj?.ToString() ?? "";
+                string xListStr = ConvertTreeToPythonList(xTree);
+                
+                if (string.IsNullOrEmpty(xListStr) || xListStr == "[]")
+                {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "X输入数据为空");
+                    return;
+                }
+
+                System.Text.StringBuilder pythonCodeBuilder = new System.Text.StringBuilder();
+                pythonCodeBuilder.AppendLine("# -*- coding: utf-8 -*-");
+                pythonCodeBuilder.AppendLine("import sys");
+                pythonCodeBuilder.AppendLine("import os");
+                pythonCodeBuilder.AppendLine("import json");
+                pythonCodeBuilder.AppendLine("import site");
+                pythonCodeBuilder.AppendLine("import io");
+                pythonCodeBuilder.AppendLine("import pickle");
+                pythonCodeBuilder.AppendLine("import base64");
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("# 设置标准输出编码为UTF-8");
+                pythonCodeBuilder.AppendLine("if sys.stdout.encoding != 'utf-8':");
+                pythonCodeBuilder.AppendLine("    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')");
+                pythonCodeBuilder.AppendLine("if sys.stderr.encoding != 'utf-8':");
+                pythonCodeBuilder.AppendLine("    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')");
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine($"# 添加项目路径");
+                pythonCodeBuilder.AppendLine($"sys.path.insert(0, r'{mymlPath}')");
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("# 确保Rhino Python的site-packages在路径中");
+                pythonCodeBuilder.AppendLine("try:");
+                pythonCodeBuilder.AppendLine("    site_packages = site.getsitepackages()");
+                pythonCodeBuilder.AppendLine("    for sp in site_packages:");
+                pythonCodeBuilder.AppendLine("        if sp not in sys.path:");
+                pythonCodeBuilder.AppendLine("            sys.path.insert(0, sp)");
+                pythonCodeBuilder.AppendLine("    ");
+                pythonCodeBuilder.AppendLine("    rhino_site_envs = r'C:\\Users\\Administrator\\.rhinocode\\py39-rh8\\site-envs'");
+                pythonCodeBuilder.AppendLine("    if os.path.exists(rhino_site_envs):");
+                pythonCodeBuilder.AppendLine("        for item in os.listdir(rhino_site_envs):");
+                pythonCodeBuilder.AppendLine("            env_path = os.path.join(rhino_site_envs, item)");
+                pythonCodeBuilder.AppendLine("            if os.path.isdir(env_path):");
+                pythonCodeBuilder.AppendLine("                if env_path not in sys.path:");
+                pythonCodeBuilder.AppendLine("                    sys.path.insert(0, env_path)");
+                pythonCodeBuilder.AppendLine("                site_pkg = os.path.join(env_path, 'Lib', 'site-packages')");
+                pythonCodeBuilder.AppendLine("                if os.path.exists(site_pkg) and site_pkg not in sys.path:");
+                pythonCodeBuilder.AppendLine("                    sys.path.insert(0, site_pkg)");
+                pythonCodeBuilder.AppendLine("except Exception:");
+                pythonCodeBuilder.AppendLine("    pass");
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("from components.predict_components import predict_regressor");
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("# 反序列化模型");
+                pythonCodeBuilder.AppendLine("try:");
+                pythonCodeBuilder.Append("    model_bytes = base64.b64decode(r'''");
+                pythonCodeBuilder.Append(modelStr);
+                pythonCodeBuilder.AppendLine("''')");
+                pythonCodeBuilder.AppendLine("    model = pickle.loads(model_bytes)");
+                pythonCodeBuilder.AppendLine("except Exception as e:");
+                pythonCodeBuilder.AppendLine("    print('ERROR:无效的模型对象')");
+                pythonCodeBuilder.AppendLine("    exit(1)");
+                pythonCodeBuilder.AppendLine();
+                
+                // 处理 X 输入（Tree结构）
+                pythonCodeBuilder.AppendLine("# 处理X输入（Tree结构）");
+                pythonCodeBuilder.Append("X = ");
+                pythonCodeBuilder.Append(xListStr);
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("# 调用预测函数（使用X）");
+                pythonCodeBuilder.AppendLine("predictions, readme = predict_regressor(model, X=X, dataset=None)");
+                
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("# 转换预测结果为Tree结构格式");
+                pythonCodeBuilder.AppendLine("import numpy as np");
+                pythonCodeBuilder.AppendLine("pred_list = predictions.tolist() if hasattr(predictions, 'tolist') else list(predictions)");
+                pythonCodeBuilder.AppendLine("pred_tree = [[val] for val in pred_list] if len(pred_list) > 0 and isinstance(pred_list[0], (int, float)) else pred_list");
+                pythonCodeBuilder.AppendLine();
+                pythonCodeBuilder.AppendLine("print('OUTPUT_0:' + json.dumps(pred_tree, ensure_ascii=False))");
+                pythonCodeBuilder.AppendLine("print('OUTPUT_1:' + readme)");
+                
+                string pythonCode = pythonCodeBuilder.ToString();
+
+                string output = PythonScriptExecutor.ExecuteCode(pythonCode);
+                
+                // 解析输出
+                string predJson = ExtractValue(output, "OUTPUT_0:");
+                string pythonReadme = ExtractValue(output, "OUTPUT_1:");
+
+                GH_Structure<GH_String> predTree = TreeConverter.ConvertJsonToTree(predJson);
+
+                DA.SetDataTree(0, predTree);
+                
+                // Readme输出
+                string readme = @"组件名称: Predict Regressor
+功能: 使用训练好的回归模型进行预测
+
+═══════════════════════════════════════════════════════════════
+输入参数详解:
+═══════════════════════════════════════════════════════════════
+
+1. Model (模型) - Generic类型，必需
+   • 数据类型: 训练好的回归模型对象（Base64编码的pickle对象）
+   • 数据结构: 包含训练好的回归模型的所有信息
+   • 连接建议:
+     ← Train Regressor的Model输出（最常用）
+     ← Load Model的Model输出（加载已保存的模型）
+   • 注意事项: 
+     - 必须是有效的回归模型对象
+     - 模型必须已经训练完成
+     - 模型类型必须与预测任务匹配（回归模型）
+
+2. X (特征数据) - Tree结构，必需
+   • 数据类型: Grasshopper Tree结构
+   • 数据结构: 每个分支包含一个样本的特征值（列表）
+   • 说明: 
+     - 直接提供特征数据进行预测
+     - 每个分支代表一个样本，分支中的值代表该样本的特征
+   • 示例:
+     {0} → [1.2, 3.4, 5.6]
+     {1} → [2.1, 4.5, 6.7]
+   • 连接建议:
+     ← Deconstruct Dataset的X输出
+     ← 其他Grasshopper组件输出的Tree结构数据
+   • 注意事项: 
+     - X中的特征数量必须与训练时的特征数量一致
+     - 特征顺序必须与训练时一致
+     - 数据格式必须与训练时一致（如是否标准化）
+
+═══════════════════════════════════════════════════════════════
+输出参数详解:
+═══════════════════════════════════════════════════════════════
+
+1. Predictions (预测结果) - Tree结构
+   • 数据类型: Grasshopper Tree结构
+   • 数据结构: 
+     - 每个分支包含一个预测值（单元素分支）
+     - 分支路径为 {0}, {1}, {2}...（样本索引）
+   • 示例:
+     {0} → [""5.2""]
+     {1} → [""4.8""]
+     {2} → [""6.1""]
+   • 说明: 预测值是连续数值（回归任务的输出）
+   • 连接建议:
+     → Write CSV/Excel的Data输入（保存预测结果）
+     → Evaluate Regression的Predictions输入（评估预测结果）
+     → 其他Grasshopper组件（进一步处理）
+
+═══════════════════════════════════════════════════════════════
+典型工作流程:
+═══════════════════════════════════════════════════════════════
+
+测试集预测:
+Split Dataset (Test Dataset) → Deconstruct Dataset (X) → Predict Regressor (X) → Predictions
+
+新数据预测:
+Read CSV/Excel → Create Dataset → Deconstruct Dataset (X) → Predict Regressor (X) → Predictions
+
+完整评估流程:
+Split Dataset (Test Dataset) → Deconstruct Dataset (X) → Predict Regressor (X) → Predictions
+Split Dataset (Test Dataset) → Deconstruct Dataset → Labels → Evaluate Regression (Y True)
+
+═══════════════════════════════════════════════════════════════
+注意事项:
+═══════════════════════════════════════════════════════════════
+
+1. Model必须是回归模型，不能是分类或聚类模型
+2. X中的特征数量必须与训练时一致
+3. 如果训练时进行了数据预处理（如标准化），预测时也需要相同的预处理
+4. 预测结果是连续数值，不是类别标签
+5. 预测结果可以用于评估、保存或进一步分析";
+                
+                DA.SetData(1, readme);
+            }
+            catch (Exception ex)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                RhinoApp.WriteLine($"SimpleML错误: {ex}");
+            }
+        }
+
+        private string ConvertTreeToPythonList(Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> tree)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.Append("[");
+            bool first = true;
+            foreach (var path in tree.Paths)
+            {
+                if (!first) sb.Append(", ");
+                sb.Append("[");
+                var branch = tree[path];
+                bool firstItem = true;
+                foreach (var item in branch)
+                {
+                    if (!firstItem) sb.Append(", ");
+                    string value = item.ToString();
+                    if (double.TryParse(value, out double num))
+                        sb.Append(num);
+                    else
+                        sb.Append("\"").Append(value.Replace("\"", "\\\"")).Append("\"");
+                    firstItem = false;
+                }
+                sb.Append("]");
+                first = false;
+            }
+            sb.Append("]");
+            return sb.ToString();
+        }
+
+        private string GetMyMLPath()
+        {
+            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
+            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
+                return envPath;
+
+            string defaultPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "Grasshopper", "UserObjects", "SimpleML", "myML");
+            if (Directory.Exists(defaultPath))
+                return defaultPath;
+
+            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string ghaDir = Path.GetDirectoryName(ghaPath);
+            string relativePath = Path.Combine(ghaDir, "myML");
+            if (Directory.Exists(relativePath))
+                return relativePath;
+
+            return null;
+        }
+
+        private string ExtractValue(string output, string prefix)
+        {
+            int startIndex = output.IndexOf(prefix);
+            if (startIndex == -1) return string.Empty;
+            startIndex += prefix.Length;
+            int endIndex = output.IndexOf('\n', startIndex);
+            if (endIndex == -1) endIndex = output.Length;
+            return output.Substring(startIndex, endIndex - startIndex).Trim();
+        }
+
+        protected override System.Drawing.Bitmap Icon => IconLoader.LoadComponentIcon(nameof(PredictRegressorComponent));
+        public override Guid ComponentGuid => new Guid("C6D7E8F9-A0B1-2345-9012-345678901246");
+    }
+}

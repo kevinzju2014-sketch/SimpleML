@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Visual Studio
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+bin/
+obj/
+*.dll
+*.pdb
+
+# Grasshopper
+*.gh
+*.ghx
+*.ghuser
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Visual Studio 缓存（保留 GHA_Project 源码，仅忽略 .vs）
+.vs/
