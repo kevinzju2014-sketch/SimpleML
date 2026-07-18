@@ -167,6 +167,7 @@ class TestWizardAndDocsPresence(unittest.TestCase):
             "docs/INSTALL_GUIDE.md",
             "docs/USER_GUIDE.md",
             "docs/COMPONENT_REFERENCE.md",
+            "docs/FOR_RHINO_PC.md",
             "examples/01_classification_iris.md",
             "install.bat",
             "install.sh",
