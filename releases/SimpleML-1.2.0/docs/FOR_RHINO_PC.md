@@ -2,26 +2,34 @@
 
 本页是最短路径；完整说明见 [INSTALL_GUIDE.md](INSTALL_GUIDE.md)。
 
-## 1. 拿到代码
+## 1. 拿到已编译包（最快）
 
-把本仓库拉到本机（或下载 ZIP 解压）。
+仓库里已有发布包：
 
-## 2. 编译 `.gha`（只需一次）
+- `releases/SimpleML-1.2.0.zip`（或目录 `releases/SimpleML-1.2.0/`）
 
-本机需已安装 Rhino 与 .NET SDK：
+解压后复制到 Grasshopper `Libraries/SimpleML/`，再装 Python 依赖。详见 `releases/README.md`。
+
+## 2. 或从源码一键编译 + 安装
+
+```bash
+bash scripts/build_and_install.sh
+```
+
+会：安装 Python 依赖 → 编译 `SimpleML.gha`（无本机 Rhino 时用 NuGet）→ 生成 `dist/SimpleML/` → 安装到 Libraries。
+
+本机有 Rhino 时也可：
 
 ```bash
 dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
 ```
 
-产物：`GHA_Project/bin/Release/SimpleML.gha`
+然后：
 
-## 3. 一键安装
-
-- **Windows**：双击仓库根目录 `install.bat`
+- **Windows**：双击 `install.bat`
 - **macOS**：`chmod +x install.sh && ./install.sh`
 
-## 4. 重启 Rhino → 打开 Grasshopper
+## 3. 重启 Rhino → 打开 Grasshopper
 
 搜索并放置这些组件，按顺序连线：
 
@@ -33,7 +41,7 @@ dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
 
 也可先放 **新手向导**，按它输出的步骤连线。
 
-## 5. 给你评估用的检查表
+## 4. 给你评估用的检查表
 
 - [ ] 组件面板能搜到 SimpleML / 环境体检 / 智能训练  
 - [ ] 环境体检 PASS  

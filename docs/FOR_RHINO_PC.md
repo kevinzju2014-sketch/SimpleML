@@ -29,7 +29,7 @@ dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
 - **Windows**：双击 `install.bat`
 - **macOS**：`chmod +x install.sh && ./install.sh`
 
-## 4. 重启 Rhino → 打开 Grasshopper
+## 3. 重启 Rhino → 打开 Grasshopper
 
 搜索并放置这些组件，按顺序连线：
 
@@ -41,7 +41,7 @@ dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
 
 也可先放 **新手向导**，按它输出的步骤连线。
 
-## 5. 给你评估用的检查表
+## 4. 给你评估用的检查表
 
 - [ ] 组件面板能搜到 SimpleML / 环境体检 / 智能训练  
 - [ ] 环境体检 PASS  
