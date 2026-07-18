@@ -19,14 +19,7 @@
 
 ## 二、推荐安装流程（10 分钟）
 
-### 最快：使用已编译发布包
-
-1. 下载 / 打开仓库中的 `releases/SimpleML-1.2.0.zip`
-2. 解压，将内容放到 Grasshopper `Libraries/SimpleML/`（见 `releases/README.md`）
-3. `pip install -r myML/requirements.txt`
-4. 重启 Rhino → **环境体检**
-
-### 步骤 A：安装 Python 依赖（从源码时）
+### 步骤 A：安装 Python 依赖
 
 在**将要被插件调用的同一个 Python** 中执行：
 
@@ -40,23 +33,11 @@ python3 -m pip install -r requirements.txt
 
 依赖：`scikit-learn`、`numpy`、`pandas`、`joblib`、`openpyxl`。
 
-### 步骤 B：编译插件
-
-**一键（推荐，无本机 Rhino 也可用 NuGet 编译）：**
-
-```bash
-bash scripts/build_and_install.sh
-```
-
-产物：`dist/SimpleML/SimpleML.gha`、`dist/SimpleML_Install.zip`，并写入 Libraries。
-
-**或手动：**
+### 步骤 B：编译插件（本机有 Rhino 时）
 
 ```bash
 cd GHA_Project
 dotnet build SimpleML.csproj -c Release -p:RhinoMajorVersion=7
-# 无本机 Rhino 时：
-dotnet build SimpleML.csproj -c Release -p:UseNuGetRhino=true
 ```
 
 成功后生成：
@@ -80,8 +61,6 @@ install.bat
 
 ```bash
 bash install.sh
-# 或完整编译+安装：
-bash scripts/build_and_install.sh
 ```
 
 脚本会：

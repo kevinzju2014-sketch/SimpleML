@@ -42,15 +42,20 @@
 
 ## 快速开始（你的 Rhino 电脑）
 
-1. **编译**（需本机已装 Rhino + .NET SDK）：
-   ```bash
-   dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
-   ```
-2. **一键安装**（仓库根目录）：
-   - Windows：双击 `install.bat`
-   - macOS：`chmod +x install.sh && ./install.sh`
-3. 重启 Rhino → Grasshopper → 运行 **环境体检（Health Check）**
-4. 按 [docs/INSTALL_GUIDE.md](docs/INSTALL_GUIDE.md) 验收清单走通鸢尾花流程
+**最快：用已编译包**
+
+1. 解压 [`releases/SimpleML-1.2.0.zip`](releases/SimpleML-1.2.0.zip)
+2. 复制到 Grasshopper `Libraries/SimpleML/`（见 [releases/README.md](releases/README.md)）
+3. `python -m pip install -r myML/requirements.txt`（或 `python3`）
+4. 重启 Rhino → **环境体检** → 按 [docs/FOR_RHINO_PC.md](docs/FOR_RHINO_PC.md) 验收
+
+**或从源码一键编译 + 安装：**
+
+```bash
+bash scripts/build_and_install.sh
+```
+
+也会生成 `dist/SimpleML/` 与 zip。Windows 可用 `install.bat`；Mac 可用 `./install.sh`。
 
 或手动：
 

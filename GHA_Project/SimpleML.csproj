@@ -3,8 +3,10 @@
   <!--
     兼容原则：
     - 目标框架 net48：Rhino 7 / 8 / 更新版本（Windows + Mac）通用
-    - 默认优先引用 Rhino 7 程序集（向前兼容到 Rhino 8+）
+    - 默认优先引用本机 Rhino 7 程序集（向前兼容到 Rhino 8+）
+    - 本机无 Rhino 时：自动改用 NuGet RhinoCommon/Grasshopper（便于 CI / 云端编译）
     - 可用 /p:RhinoMajorVersion=7|8|9 或 /p:RhinoSystemDir=... 覆盖
+    - /p:UseNuGetRhino=true 强制走 NuGet
   -->
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
@@ -19,6 +21,9 @@
     <Deterministic>false</Deterministic>
     <!-- auto | 7 | 8 | 9 ...；auto 优先 Rhino 7（最大兼容），否则取已安装的最高版本 -->
     <RhinoMajorVersion Condition="'$(RhinoMajorVersion)' == ''">auto</RhinoMajorVersion>
+    <UseNuGetRhino Condition="'$(UseNuGetRhino)' == ''">auto</UseNuGetRhino>
+    <!-- NuGet 回退版本：默认 Rhino 7 最新稳定，兼容 Rhino 7+ -->
+    <RhinoNuGetVersion Condition="'$(RhinoNuGetVersion)' == ''">7.38.24338.17001</RhinoNuGetVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -50,7 +55,6 @@
 
   <!-- 解析实际使用的 Rhino 路径 -->
   <PropertyGroup Condition="'$(RhinoSystemDir)' == ''">
-    <!-- 显式主版本 -->
     <RhinoSystemDir Condition="'$(RhinoMajorVersion)' == '7' and Exists('$(_Rh7Sys)/RhinoCommon.dll')">$(_Rh7Sys)</RhinoSystemDir>
     <RhinoGrasshopperDir Condition="'$(RhinoMajorVersion)' == '7' and '$(RhinoGrasshopperDir)' == ''">$(_Rh7Gh)</RhinoGrasshopperDir>
     <RhinoSystemDir Condition="'$(RhinoMajorVersion)' == '8' and Exists('$(_Rh8Sys)/RhinoCommon.dll')">$(_Rh8Sys)</RhinoSystemDir>
@@ -58,7 +62,6 @@
     <RhinoSystemDir Condition="'$(RhinoMajorVersion)' == '9' and Exists('$(_Rh9Sys)/RhinoCommon.dll')">$(_Rh9Sys)</RhinoSystemDir>
     <RhinoGrasshopperDir Condition="'$(RhinoMajorVersion)' == '9' and '$(RhinoGrasshopperDir)' == ''">$(_Rh9Gh)</RhinoGrasshopperDir>
 
-    <!-- auto：优先 Rhino 7（向前兼容），否则 8，再否则 9 -->
     <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and Exists('$(_Rh7Sys)/RhinoCommon.dll')">$(_Rh7Sys)</RhinoSystemDir>
     <RhinoGrasshopperDir Condition="'$(RhinoGrasshopperDir)' == '' and Exists('$(_Rh7Sys)/RhinoCommon.dll')">$(_Rh7Gh)</RhinoGrasshopperDir>
     <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and Exists('$(_Rh8Sys)/RhinoCommon.dll')">$(_Rh8Sys)</RhinoSystemDir>
@@ -72,15 +75,23 @@
     <RhinoGrasshopperDir>$(_Rh7GhAlt)</RhinoGrasshopperDir>
   </PropertyGroup>
 
-  <Target Name="PrintRhinoRefs" BeforeTargets="ResolveAssemblyReferences">
-    <Message Importance="high" Text="SimpleML build target: net48 | RhinoMajorVersion=$(RhinoMajorVersion)" />
-    <Message Importance="high" Text="RhinoCommon: $(RhinoSystemDir)" />
-    <Message Importance="high" Text="Grasshopper: $(RhinoGrasshopperDir)" />
-    <Warning Condition="'$(RhinoSystemDir)' == '' or !Exists('$(RhinoSystemDir)/RhinoCommon.dll')"
-             Text="未找到 RhinoCommon.dll。请安装 Rhino 7+，或传入 /p:RhinoSystemDir=... 与 /p:RhinoGrasshopperDir=..." />
-  </Target>
+  <!-- 无本机 Rhino 或强制 NuGet 时启用包引用 -->
+  <PropertyGroup>
+    <_LocalRhinoOk Condition="'$(RhinoSystemDir)' != '' and Exists('$(RhinoSystemDir)/RhinoCommon.dll') and '$(RhinoGrasshopperDir)' != '' and Exists('$(RhinoGrasshopperDir)/Grasshopper.dll')">true</_LocalRhinoOk>
+    <_UseNuGet Condition="'$(UseNuGetRhino)' == 'true' or ('$(UseNuGetRhino)' == 'auto' and '$(_LocalRhinoOk)' != 'true')">true</_UseNuGet>
+  </PropertyGroup>
 
+  <!-- Linux / 无 .NET Framework 本机安装时，用参考程序集编译 net48 -->
   <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(_UseNuGet)' == 'true'">
+    <PackageReference Include="RhinoCommon" Version="$(RhinoNuGetVersion)" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="Grasshopper" Version="$(RhinoNuGetVersion)" ExcludeAssets="runtime" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(_UseNuGet)' != 'true'">
     <Reference Include="Grasshopper">
       <HintPath>$(RhinoGrasshopperDir)/Grasshopper.dll</HintPath>
       <Private>False</Private>
@@ -93,12 +104,22 @@
       <HintPath>$(RhinoSystemDir)/RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+
+  <Target Name="PrintRhinoRefs" BeforeTargets="ResolveAssemblyReferences">
+    <Message Importance="high" Text="SimpleML build target: net48 | RhinoMajorVersion=$(RhinoMajorVersion) | UseNuGet=$(_UseNuGet)" />
+    <Message Importance="high" Text="RhinoCommon: $(RhinoSystemDir)" Condition="'$(_UseNuGet)' != 'true'" />
+    <Message Importance="high" Text="Grasshopper: $(RhinoGrasshopperDir)" Condition="'$(_UseNuGet)' != 'true'" />
+    <Message Importance="high" Text="Using NuGet RhinoCommon/Grasshopper $(RhinoNuGetVersion)" Condition="'$(_UseNuGet)' == 'true'" />
+  </Target>
 
   <ItemGroup>
     <None Include="..\**\*.py" />

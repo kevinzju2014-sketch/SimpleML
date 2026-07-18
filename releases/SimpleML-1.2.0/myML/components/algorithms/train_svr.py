@@ -1,0 +1,87 @@
+"""
+支持向量回归器参数配置组件
+用于 Grasshopper Python 组件
+注意：此组件只负责配置算法参数，不进行实际训练
+"""
+
+import sys
+import os
+import site
+import json
+
+# 添加项目路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+components_dir = os.path.dirname(current_dir)
+project_dir = os.path.dirname(components_dir)
+if project_dir not in sys.path:
+    sys.path.insert(0, project_dir)
+
+# 跨平台引导
+try:
+    from core.env_bootstrap import bootstrap_python_paths
+    bootstrap_python_paths(project_dir)
+except Exception:
+    pass
+
+
+def train_svr(kernel='rbf', C=1.0, gamma='scale', degree=3,
+              coef0=0.0, epsilon=0.1, tol=1e-3):
+    """
+    配置支持向量回归器参数（不进行实际训练）
+    
+    输入参数:
+        kernel: 核函数类型，默认"rbf"（可选：linear, poly, sigmoid, rbf, precomputed）
+        C: 惩罚系数，默认1.0
+        gamma: 核函数系数，默认"scale"（可选：scale, auto或浮点数）
+        degree: 多项式核的度数，默认3（仅用于poly核）
+        coef0: 核函数中的独立项，默认0.0（用于poly和sigmoid核）
+        epsilon: Epsilon-tube的宽度，默认0.1
+        tol: 停止训练的容差，默认1e-3
+    
+    输出参数:
+        algorithm_params: 本次配置的参数字典（JSON格式），连接到通用训练组件的Algorithm输入
+        readme: 算法说明
+    """
+    # 处理gamma
+    if isinstance(gamma, str):
+        if gamma.lower() not in ['scale', 'auto']:
+            try:
+                gamma = float(gamma)
+            except:
+                pass
+    
+    # 构建参数字典
+    params = {
+        'algorithm': 'svr',
+        'kernel': str(kernel),
+        'C': float(C),
+        'degree': int(degree),
+        'coef0': float(coef0),
+        'epsilon': float(epsilon),
+        'tol': float(tol)
+    }
+    
+    params['gamma'] = gamma
+    
+    # 转换为JSON字符串
+    algorithm_params = json.dumps(params, ensure_ascii=False)
+    
+    # 生成算法说明
+    readme = f"""支持向量回归器参数配置
+==================
+算法名称: Support Vector Regressor
+适用范围: 回归任务
+参数配置:
+  - 核函数类型: {kernel}
+  - 惩罚系数: {C}
+  - 核函数系数: {gamma}
+  - 多项式度数: {degree}
+  - 独立项: {coef0}
+  - Epsilon: {epsilon}
+  - 容差: {tol}
+
+注意: 此组件只配置参数，不进行实际训练。
+需要将Algorithm Params输出连接到Train Regressor组件完成训练。
+"""
+    
+    return algorithm_params, readme

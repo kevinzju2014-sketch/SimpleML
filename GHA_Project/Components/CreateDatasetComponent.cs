@@ -347,13 +347,13 @@ try:
     dataset = create_dataset(X_processed, labels_processed, X_names=X_names, y_names=y_names)
     # 将已拟合预处理器打包进 Dataset，供训练/预测复用
     if normalize_bool or handle_missing_bool:
-        dataset.set_preprocessor(preprocessor, {
+        dataset.set_preprocessor(preprocessor, {{
             'normalize': normalize_bool,
             'normalize_method': r'{escapedNormalizeMethod}',
             'handle_missing': handle_missing_bool,
             'missing_strategy': r'{escapedMissingStrategy}',
             'remove_outliers': remove_outliers_bool,
-        })
+        }})
     
     # 获取数据集信息
     normalize_str = '是' if normalize_bool else '否'
