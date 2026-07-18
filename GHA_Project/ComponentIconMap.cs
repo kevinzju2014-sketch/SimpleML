@@ -80,6 +80,13 @@ namespace SimpleML.Core
             { "AboutComponent", "about.png" },
             { "InstallationGuideComponent", "installation_guide.png" },
             { "HealthCheckComponent", "health_check.png" },
+            { "PredictAutoComponent", "predict_auto.png" },
+            { "EvaluateAutoComponent", "evaluate_auto.png" },
+            { "BeginnerWizardComponent", "beginner_wizard.png" },
+            { "QuickCreateDatasetComponent", "quick_dataset.png" },
+            { "QuickClusterColorComponent", "quick_cluster_color.png" },
+            { "CancelPythonSessionComponent", "reset_python.png" },
+
         };
 
         public static string GetIconFileName(string componentName)

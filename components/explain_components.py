@@ -13,6 +13,52 @@ from sklearn.metrics import silhouette_score
 from core.model_bundle import SimpleMLModel, unwrap_model
 
 
+def verdict_classification(metrics: dict) -> str:
+    acc = metrics.get("accuracy")
+    if acc is None:
+        return "结论: 无法计算准确率，请检查测试集标签。"
+    a = float(acc)
+    if a >= 0.9:
+        level, tip = "很强", "可进入试用；仍建议看混淆矩阵是否某类偏弱。"
+    elif a >= 0.7:
+        level, tip = "可用", "作为基线可用；可尝试更多特征或随机森林。"
+    elif a >= 0.5:
+        level, tip = "偏弱", "建议检查数据质量、类别平衡，或换算法。"
+    else:
+        level, tip = "较差", "先确认标签与特征是否接对，再考虑重新训练。"
+    return f"结论: {level}（准确率 {a*100:.1f}%）。{tip}"
+
+
+def verdict_regression(metrics: dict) -> str:
+    r2 = metrics.get("r2_score")
+    if r2 is None:
+        return "结论: 无法计算 R²，请检查测试集。"
+    v = float(r2)
+    if v >= 0.9:
+        level, tip = "很强", "拟合很好，注意是否过拟合。"
+    elif v >= 0.7:
+        level, tip = "较好", "可作为实用基线。"
+    elif v >= 0.3:
+        level, tip = "一般", "可尝试非线性模型或特征工程。"
+    else:
+        level, tip = "偏弱", "检查特征是否相关，或增加数据量。"
+    return f"结论: {level}（R²={v:.3f}）。{tip}"
+
+
+def verdict_clustering(metrics: dict) -> str:
+    sil = metrics.get("silhouette_score")
+    if sil is None:
+        return "结论: 无法计算轮廓系数（簇数可能不足）。可用肘部法则重选 K。"
+    s = float(sil)
+    if s >= 0.5:
+        level, tip = "簇结构清晰", "可直接用于分组可视化。"
+    elif s >= 0.25:
+        level, tip = "有一定结构", "可调整 K 或先标准化。"
+    else:
+        level, tip = "边界较弱", "建议 Elbow Method 换 K，或改用 DBSCAN。"
+    return f"结论: {level}（轮廓系数={s:.3f}）。{tip}"
+
+
 def explain_classification_metrics(metrics: dict) -> str:
     acc = metrics.get("accuracy")
     lines = ["通俗解读（分类）", "=" * 40]

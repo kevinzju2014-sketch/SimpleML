@@ -22,7 +22,7 @@ def main():
 
     ds = create_dataset(X, y, X_names=list(feature_names) if feature_names is not None else None)
     train_ds, test_ds = split_dataset(ds, test_size=0.2, random_state=42)
-    model, _info, explanation, _readme = smart_train(train_ds, task="classification")
+    model, _info, explanation, _readme, next_steps, card = smart_train(train_ds, task="classification")
     _metrics_json, report, _cm, _ = evaluate_classification(
         model, X=test_ds.get_X(), y_true=test_ds.get_y()
     )
@@ -32,6 +32,8 @@ def main():
 
     print("=== Smart Train ===")
     print(explanation)
+    print(card)
+    print(next_steps)
     print("\n=== Evaluation (excerpt) ===")
     print(report[-900:] if len(report) > 900 else report)
     print("\n=== Feature Importance ===")

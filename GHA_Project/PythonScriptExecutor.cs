@@ -317,6 +317,13 @@ namespace SimpleML.Core
             }
         }
 
+        /// <summary>供「重置Python会话」组件调用。</summary>
+        public static void ResetSessionPublic()
+        {
+            ResetSession();
+            _pythonPath = null;
+        }
+
         private static void ResetSessionUnlocked()
         {
             try { _sessionStdin?.Dispose(); } catch { }

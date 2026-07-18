@@ -29,10 +29,10 @@ namespace SimpleML.Components.ModelEvaluation
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Metrics", "M", "评估指标（Tree结构，每个分支包含指标名称和值）", GH_ParamAccess.tree);
-            pManager.AddTextParameter("Report", "R", "详细的评估报告", GH_ParamAccess.item);
+            pManager.AddTextParameter("Report", "Rep", "详细的评估报告", GH_ParamAccess.item);
             pManager.AddGenericParameter("Confusion Matrix", "CM", "混淆矩阵（Tree结构）", GH_ParamAccess.tree);
             pManager.AddGenericParameter("Predictions", "P", "预测结果（Tree结构，每个分支包含一个预测类别）", GH_ParamAccess.tree);
-            pManager.AddTextParameter("Readme", "R", "组件使用说明", GH_ParamAccess.item);
+            pManager.AddTextParameter("Readme", "RM", "组件使用说明", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

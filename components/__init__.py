@@ -116,3 +116,11 @@ __all__ = [
     'calculate_feature_importance',
     'calculate_silhouette',
 ]
+
+from .ux_helpers import predict_auto, evaluate_auto, wizard_recipe, model_card, next_steps_for_model
+from .health_check import run_health_check, auto_install_deps
+
+__all__ += [
+    'predict_auto', 'evaluate_auto', 'wizard_recipe', 'model_card', 'next_steps_for_model',
+    'auto_install_deps',
+]

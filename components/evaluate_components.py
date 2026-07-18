@@ -34,6 +34,9 @@ from components.explain_components import (
     explain_classification_metrics,
     explain_regression_metrics,
     explain_clustering_metrics,
+    verdict_classification,
+    verdict_regression,
+    verdict_clustering,
 )
 
 
@@ -163,14 +166,26 @@ def evaluate_classification(model, X=None, y_true=None, y_pred=None, metrics='al
 
 ===================================================================
 """
-        report = report_base + explanation + "\n\n" + explain_classification_metrics(metrics_dict)
-    except:
-        report = f"分类报告生成失败\n准确率: {metrics_dict.get('accuracy', 'N/A')}\n\n" + explain_classification_metrics(metrics_dict)
+        report = (
+            report_base
+            + explanation
+            + "\n\n"
+            + explain_classification_metrics(metrics_dict)
+            + "\n\n"
+            + verdict_classification(metrics_dict)
+        )
+    except Exception:
+        report = (
+            f"分类报告生成失败\n准确率: {metrics_dict.get('accuracy', 'N/A')}\n\n"
+            + explain_classification_metrics(metrics_dict)
+            + "\n\n"
+            + verdict_classification(metrics_dict)
+        )
     
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "分类模型评估完成（含通俗解读）"
+    readme = "分类模型评估完成（含通俗解读与结论）"
     
     return metrics_json, report, confusion_matrix_tree, readme
 
@@ -311,12 +326,19 @@ R² 分数: {metrics_dict.get('r2_score', 'N/A'):.4f}
 
 ===================================================================
 """
-    report = report_base + explanation + "\n\n" + explain_regression_metrics(metrics_dict)
+    report = (
+        report_base
+        + explanation
+        + "\n\n"
+        + explain_regression_metrics(metrics_dict)
+        + "\n\n"
+        + verdict_regression(metrics_dict)
+    )
     
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "回归模型评估完成（含通俗解读）"
+    readme = "回归模型评估完成（含通俗解读与结论）"
     
     return metrics_json, report, readme
 
@@ -424,11 +446,13 @@ Calinski-Harabasz指数: {metrics_dict.get('calinski_harabasz_score', 'N/A')}
 归一化互信息(NMI): {metrics_dict.get('normalized_mutual_info', 'N/A')}
 
 {explain_clustering_metrics(metrics_dict)}
+
+{verdict_clustering(metrics_dict)}
 """
     
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "聚类模型评估完成（含通俗解读与ARI/NMI）"
+    readme = "聚类模型评估完成（含通俗解读、结论与ARI/NMI）"
     
     return metrics_json, report, readme

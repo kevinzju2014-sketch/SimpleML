@@ -16,7 +16,7 @@ namespace SimpleML
         public override string AuthorContact => "zhao_guijia@outlook.com";
         // 正式插件 GUID（请勿再使用占位符）
         public override Guid Id => new Guid("8F3C2A91-6B47-4E1D-9C55-2D8A0E7B4F16");
-        public override string Version => "1.1.1";
+        public override string Version => "1.2.0";
         
         public override System.Drawing.Bitmap Icon => null;
         

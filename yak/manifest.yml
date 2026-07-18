@@ -1,0 +1,19 @@
+# Yak package manifest for Rhino / Food4Rhino distribution
+# Build GHA first, then pack contents of yak/dist/
+name: simpleml
+version: 1.2.0
+authors:
+  - 参数化凯通学
+description: >
+  Grasshopper machine learning plugin powered by scikit-learn.
+  Compatible with Rhino 7+ on Windows and macOS.
+  Beginner-friendly Smart Train, Health Check, and Wizard.
+url: https://github.com/kevinzju2014-sketch/SimpleML
+keywords:
+  - grasshopper
+  - machine-learning
+  - sklearn
+  - clustering
+  - classification
+  - regression
+icon: ../GHA_Project/icons/smart_train.png

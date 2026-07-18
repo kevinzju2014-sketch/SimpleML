@@ -1,11 +1,12 @@
 """
-安装与运行环境体检。
+安装与运行环境体检（含下一步引导与可选自动安装依赖）。
 """
 
 from __future__ import annotations
 
 import os
 import platform
+import subprocess
 import sys
 from typing import Dict, List, Tuple
 
@@ -35,12 +36,84 @@ def _pkg_version(mod_name: str) -> Tuple[bool, str]:
         return False, str(exc)
 
 
-def run_health_check(project_dir: str = None) -> Dict:
+def _os_family() -> str:
+    s = platform.system().lower()
+    if s == "darwin":
+        return "mac"
+    if s == "windows":
+        return "windows"
+    return "linux"
+
+
+def build_next_steps(status: str, required_failed: List[dict], project_dir: str) -> str:
+    lines = ["下一步（请按顺序）", "=" * 40]
+    if status == "PASS":
+        lines.append("1. 在 Grasshopper 搜索「新手向导」，选择 classification")
+        lines.append("2. 或打开 examples/ 中的配方说明，按线连接")
+        lines.append("3. 推荐链路: 加载示例数据集 → 分割 → 智能训练 → 预测 → 评估")
+        return "\n".join(lines)
+
+    fam = _os_family()
+    missing_deps = [c for c in required_failed if c["name"].startswith("依赖")]
+    path_fail = [c for c in required_failed if "PATH" in c["name"] or "目录" in c["name"]]
+
+    step = 1
+    if path_fail:
+        lines.append(f"{step}. 在 Grasshopper 搜索并打开「安装指南」组件，按平台说明放置 .gha 与 myML")
+        step += 1
+        if fam == "mac":
+            lines.append(f"{step}. macOS: 把文件放到 Rhinoceros/7.0 或 8.0 的 Grasshopper/Libraries/SimpleML/")
+        else:
+            lines.append(f"{step}. Windows: 放到 %APPDATA%\\Grasshopper\\Libraries\\SimpleML\\")
+        step += 1
+        lines.append(f"{step}. 或运行仓库根目录 install.sh / install.bat（会提示复制路径）")
+        step += 1
+
+    if missing_deps:
+        lines.append(f"{step}. 缺少 Python 依赖。任选其一：")
+        lines.append("   a) 将「环境体检」的 AutoFix 设为 true（自动 pip）")
+        lines.append("   b) 终端执行:")
+        lines.append(f"      \"{sys.executable}\" -m pip install scikit-learn numpy pandas joblib openpyxl")
+        step += 1
+        if fam == "mac":
+            lines.append(f"{step}. Apple Silicon 可用: /opt/homebrew/bin/python3 -m pip install ...")
+            step += 1
+
+    lines.append(f"{step}. 重新运行「环境体检」，确认 PASS 后再训练")
+    step += 1
+    lines.append(f"{step}. 若仍失败: 打开「安装指南」+ 查看 About 联系方式")
+    if project_dir:
+        lines.append(f"\n当前包路径候选: {project_dir}")
+    return "\n".join(lines)
+
+
+def auto_install_deps() -> Tuple[bool, str]:
+    """尝试用当前解释器 pip 安装依赖。"""
+    pkgs = ["scikit-learn", "numpy", "pandas", "joblib", "openpyxl"]
+    try:
+        cmd = [sys.executable, "-m", "pip", "install", "--upgrade"] + pkgs
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+        out = (proc.stdout or "")[-1500:]
+        err = (proc.stderr or "")[-1500:]
+        ok = proc.returncode == 0
+        detail = out + ("\n" + err if err else "")
+        return ok, detail if detail else ("安装成功" if ok else "安装失败")
+    except Exception as exc:
+        return False, str(exc)
+
+
+def run_health_check(project_dir: str = None, auto_fix: bool = False) -> Dict:
     added = bootstrap_python_paths(project_dir)
     root = ensure_project_on_path(project_dir)
 
     checks = []
     ok_count = 0
+    auto_fix_log = ""
 
     def add(name, ok, detail):
         nonlocal ok_count
@@ -51,13 +124,23 @@ def run_health_check(project_dir: str = None) -> Dict:
     add("操作系统", True, f"{platform.system()} {platform.release()} ({platform.machine()})")
     add("Python", True, f"{sys.version.split()[0]} @ {sys.executable}")
     add("SIMPLEML_PATH", bool(root and os.path.isdir(root)), root or "未找到项目路径")
-    add("components 目录", bool(root and os.path.isdir(os.path.join(root, "components"))),
-        os.path.join(root, "components") if root else "N/A")
-    add("core 目录", bool(root and os.path.isdir(os.path.join(root, "core"))),
-        os.path.join(root, "core") if root else "N/A")
+    add(
+        "components 目录",
+        bool(root and os.path.isdir(os.path.join(root, "components"))),
+        os.path.join(root, "components") if root else "N/A",
+    )
+    add(
+        "core 目录",
+        bool(root and os.path.isdir(os.path.join(root, "core"))),
+        os.path.join(root, "core") if root else "N/A",
+    )
 
     rhino_envs = discover_site_env_dirs()
-    add("Rhino site-envs", True, f"发现 {len(rhino_envs)} 处: {', '.join(rhino_envs[:3]) or '无（将使用当前 Python）'}")
+    add(
+        "Rhino site-envs",
+        True,
+        f"发现 {len(rhino_envs)} 处: {', '.join(rhino_envs[:3]) or '无（将使用当前 Python）'}",
+    )
 
     for name, _min_ver in REQUIRED_PACKAGES:
         found, ver = _pkg_version(name)
@@ -68,10 +151,26 @@ def run_health_check(project_dir: str = None) -> Dict:
         found, ver = _pkg_version(name)
         add(f"可选 {name}", True, ver if found else f"未安装（Excel .xlsx 可能不可用）: {ver}")
 
-    # 快速功能探测
+    required_failed = [c for c in checks if not c["ok"] and not c["name"].startswith("可选")]
+    if auto_fix and any(c["name"].startswith("依赖") for c in required_failed):
+        ok_pip, log = auto_install_deps()
+        auto_fix_log = log
+        add("自动安装依赖", ok_pip, (log[:500] + "...") if len(log) > 500 else log)
+        # 重新检测依赖
+        for name, _ in REQUIRED_PACKAGES:
+            found, ver = _pkg_version(name)
+            label = "scikit-learn" if name == "sklearn" else name
+            # 更新同名检查
+            for c in checks:
+                if c["name"] == f"依赖 {label}":
+                    c["ok"] = found
+                    c["detail"] = ver if found else f"缺失: {ver}"
+        ok_count = sum(1 for c in checks if c["ok"])
+
     try:
         from sklearn.ensemble import RandomForestClassifier
         import numpy as np
+
         clf = RandomForestClassifier(n_estimators=5, random_state=42)
         X = np.array([[0, 0], [1, 1], [0, 1], [1, 0]])
         y = np.array([0, 1, 0, 1])
@@ -84,6 +183,7 @@ def run_health_check(project_dir: str = None) -> Dict:
     total = len(checks)
     required_failed = [c for c in checks if not c["ok"] and not c["name"].startswith("可选")]
     status = "PASS" if not required_failed else "FAIL"
+    next_steps = build_next_steps(status, required_failed, root or "")
 
     lines: List[str] = []
     lines.append("SimpleML 环境体检报告")
@@ -94,19 +194,12 @@ def run_health_check(project_dir: str = None) -> Dict:
     for c in checks:
         mark = "✓" if c["ok"] else "✗"
         lines.append(f"{mark} {c['name']}: {c['detail']}")
-
     lines.append("")
-    lines.append("修复建议")
-    lines.append("-" * 56)
-    if required_failed:
-        lines.append("1) 在当前 Python 中安装依赖:")
-        lines.append("   python -m pip install -r requirements.txt")
-        lines.append("   # 或: python -m pip install scikit-learn numpy pandas joblib openpyxl")
-        lines.append("2) 若 Grasshopper 找不到代码，设置环境变量 SIMPLEML_PATH 指向插件 Python 根目录")
-        lines.append("   （该目录应包含 components/ 与 core/）")
-        lines.append("3) macOS/Linux 请确认使用 python3，并与 Rhino 调用的解释器一致")
-    else:
-        lines.append("环境正常。建议从 examples/ 打开示例工作流开始。")
+    lines.append(next_steps)
+    if auto_fix_log:
+        lines.append("")
+        lines.append("AutoFix 日志（节选）")
+        lines.append(auto_fix_log[-800:])
 
     report = "\n".join(lines)
     summary = f"{status}: {ok_count}/{total} checks passed"
@@ -114,7 +207,9 @@ def run_health_check(project_dir: str = None) -> Dict:
         "status": status,
         "summary": summary,
         "report": report,
+        "next_steps": next_steps,
         "checks": checks,
         "project_dir": root,
         "python": sys.executable,
+        "auto_fix_log": auto_fix_log,
     }

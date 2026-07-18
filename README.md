@@ -3,7 +3,7 @@
 基于 scikit-learn 的 Grasshopper 机器学习插件（免费 / MIT）。  
 目标：让设计师与非专业用户也能轻松完成分类、回归、聚类。
 
-**版本**: 1.1.1  
+**版本**: 1.2.0  
 
 ## 兼容性（原则）
 
@@ -15,6 +15,13 @@
 | Python | 3.9+（Rhino 7 用系统/Homebrew；Rhino 8+ 也可用 Rhinocode） |
 
 构建时**默认优先引用 Rhino 7 程序集**，以便同一 `.gha` 向前兼容到 Rhino 8+。
+
+## 1.2 上架向体验
+
+- **新手向导** / **环境体检 AutoFix** / **统一预测·评估**
+- **快速数据集**、**一键聚类上色**、**重置 Python 会话**
+- `install.bat` / `install.sh` + `yak/manifest.yml` + `FOOD4RHINO.md`
+- Ribbon：智能训练与统一组件置顶，高级算法电池后置
 
 ## 1.1.x 亮点
 

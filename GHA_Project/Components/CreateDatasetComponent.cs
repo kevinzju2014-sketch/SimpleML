@@ -11,6 +11,8 @@ namespace SimpleML.Components.DatasetManagement
 {
     public class CreateDatasetComponent : GH_Component
     {
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
+
         public CreateDatasetComponent()
           : base("创建数据集 Create Dataset", "创建数据集",
               "创建数据集对象，封装特征数据和标签",

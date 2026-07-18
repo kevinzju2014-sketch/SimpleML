@@ -11,6 +11,7 @@ import numpy as np
 
 from components.dataset_components import Dataset
 from components.train_components import train_classifier, train_cluster, train_regressor
+from components.ux_helpers import next_steps_for_model, model_card
 from core.model_bundle import SimpleMLModel
 
 
@@ -55,9 +56,9 @@ def smart_train(
     task: str = "auto",
     algorithm: Optional[str] = None,
     n_clusters: int = 3,
-) -> Tuple[Any, str, str, str]:
+) -> Tuple[Any, str, str, str, str, str]:
     """
-    返回: model, model_info_json, explanation, readme
+    返回: model, model_info_json, explanation, readme, next_steps, model_card_text
     """
     if dataset is None or not isinstance(dataset, Dataset):
         raise ValueError("必须提供有效的 Dataset 对象")
@@ -99,10 +100,12 @@ def smart_train(
     readme = (
         "Smart Train 一键训练完成。\n"
         f"任务: {task_name} | 算法: {algo_name}\n"
-        "新手建议: Dataset → Smart Train → Predict / Evaluate。\n"
-        "进阶调参: 使用 05 Algorithm 参数电池连接到 Train Classifier/Regressor/Cluster。"
+        "新手建议: Dataset → Smart Train → 预测 / 评估。\n"
+        "进阶调参: 使用 05 Algorithm 参数电池连接到训练组件。"
     )
-    return model, model_info, explanation, readme
+    steps = next_steps_for_model(model)
+    card = model_card(model)
+    return model, model_info, explanation, readme, steps, card
 
 
 def _build_explanation(task: str, algorithm: str, n_samples: int, n_features: int, model) -> str:
