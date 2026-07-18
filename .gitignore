@@ -5,57 +5,29 @@ __pycache__/
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual Environment
+.venv/
 venv/
 ENV/
-env/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Visual Studio
-*.sln
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+# .NET / VS
 bin/
 obj/
-*.dll
-*.pdb
+.vs/
+*.user
+*.suo
 
-# Grasshopper
-*.gh
-*.ghx
-*.ghuser
-
-# Temporary files
-*.tmp
-*.bak
-*.log
-
-# OS
+# Local / OS
 .DS_Store
 Thumbs.db
+*.log
+*.tmp
+*.bak
 
-# Visual Studio 缓存（保留 GHA_Project 源码，仅忽略 .vs）
-.vs/
+# Local backups from sync_to_helio.bat
+*_backup_old/
+
+# Compiled plugin output (rebuild locally)
+*.gha
+!GHA_Project/icons/**

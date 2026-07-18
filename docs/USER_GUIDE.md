@@ -28,7 +28,8 @@ Grasshopper 组件 (.gha, C#)
 
 ## 2. 第一次使用（最短路径）
 
-> 安装请先看 `docs/INSTALL_GUIDE.md`，确认 **环境体检 = PASS**。
+> 开发目录：`D:\Helio\250928_机器学习课程\`（用根目录 `sync_to_helio.bat` 与 GitHub 同步）。  
+> 使用前请确认 Grasshopper 中 **环境体检 = PASS**。
 
 ### 2.1 分类（推荐演示：鸢尾花）
 
@@ -195,12 +196,11 @@ Grasshopper 组件 (.gha, C#)
 
 | 文件 | 内容 |
 |------|------|
-| `docs/INSTALL_GUIDE.md` | 本机安装与验收 |
 | `docs/USER_GUIDE.md` | 本手册 |
 | `docs/COMPONENT_REFERENCE.md` | 组件速查 |
 | `examples/` | 三个任务配方 + Python 快通 |
-| `FOOD4RHINO.md` | 上架文案与打包 |
 | `README.md` | 仓库总览 |
+| `sync_to_helio.bat` | 同步到 `D:\Helio\250928_机器学习课程\` |
 | `tests/test_simpleml.py` | 自动化测试 |
 
 ---

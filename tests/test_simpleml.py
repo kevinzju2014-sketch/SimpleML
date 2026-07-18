@@ -164,15 +164,13 @@ class TestWizardAndDocsPresence(unittest.TestCase):
 
     def test_docs_exist(self):
         for rel in (
-            "docs/INSTALL_GUIDE.md",
             "docs/USER_GUIDE.md",
             "docs/COMPONENT_REFERENCE.md",
-            "docs/FOR_RHINO_PC.md",
             "examples/01_classification_iris.md",
-            "install.bat",
-            "install.sh",
-            "FOOD4RHINO.md",
+            "examples/quickstart_all.py",
+            "sync_to_helio.bat",
             "requirements.txt",
+            "GHA_Project/SimpleML.csproj",
         ):
             path = os.path.join(ROOT, rel)
             self.assertTrue(os.path.isfile(path), f"missing {rel}")

@@ -31,14 +31,14 @@ def _resolve_install_root() -> Path:
             / "Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper/Libraries/SimpleML/myML",
             Path.home()
             / "Library/Application Support/McNeel/Rhinoceros/7.0/Plug-ins/Grasshopper/Libraries/SimpleML/myML",
-            ROOT / "releases/SimpleML-1.2.0/myML",
-            ROOT,  # source fallback
+            Path(r"D:/Helio/250928_机器学习课程"),
+            ROOT,  # source / synced Helio folder
         ]
     )
     for c in candidates:
         if (c / "components").is_dir() and (c / "core").is_dir():
             return c.resolve()
-    raise RuntimeError("No SimpleML install found. Run scripts/build_and_install.sh first.")
+    raise RuntimeError("No SimpleML root found (need components/ + core/).")
 
 
 INSTALL = _resolve_install_root()
@@ -51,12 +51,15 @@ class TestInstalledLayout(unittest.TestCase):
     def test_layout_and_gha(self):
         self.assertTrue((INSTALL / "components").is_dir())
         self.assertTrue((INSTALL / "core").is_dir())
-        # GHA next to myML or one level up
-        parent = INSTALL.parent
-        gha = parent / "SimpleML.gha"
-        if not gha.is_file():
-            gha = ROOT / "releases/SimpleML-1.2.0/SimpleML.gha"
-        self.assertTrue(gha.is_file(), f"missing gha near {parent}")
+        # Optional: built gha (dev machine / Libraries)
+        candidates = [
+            INSTALL.parent / "SimpleML.gha",
+            ROOT / "GHA_Project/bin/Release/SimpleML.gha",
+            ROOT / "GHA_Project/bin/Debug/SimpleML.gha",
+        ]
+        gha = next((p for p in candidates if p.is_file()), None)
+        if gha is None:
+            self.skipTest("SimpleML.gha not built yet (ok for source-only sync)")
         self.assertGreater(gha.stat().st_size, 100_000)
 
 
