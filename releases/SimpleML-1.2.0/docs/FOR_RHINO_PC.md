@@ -2,13 +2,16 @@
 
 本页是最短路径；完整说明见 [INSTALL_GUIDE.md](INSTALL_GUIDE.md)。
 
-## 1. 拿到已编译包（最快）
+## 1. 在你的 Rhino 电脑上一键安装（最快）
 
-仓库里已有发布包：
+云端已编译并测通；请在你的电脑上执行安装（无法远程替你打开 Rhino）：
 
-- `releases/SimpleML-1.2.0.zip`（或目录 `releases/SimpleML-1.2.0/`）
+1. 拉取本分支，打开 `releases/`
+2. **Windows**：双击 `install_on_rhino_pc.bat`
+3. **macOS**：`chmod +x install_on_rhino_pc.sh && ./install_on_rhino_pc.sh`
+4. 完全退出并重启 Rhino → Grasshopper → **环境体检**
 
-解压后复制到 Grasshopper `Libraries/SimpleML/`，再装 Python 依赖。详见 `releases/README.md`。
+也可只用 zip：`releases/SimpleML-1.2.0.zip`（说明见 `releases/README.md`）。
 
 ## 2. 或从源码一键编译 + 安装
 
