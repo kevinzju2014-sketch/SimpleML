@@ -43,15 +43,16 @@ def train_ridge_regression(alpha=1.0, fit_intercept=True, normalize=False,
         algorithm_params: 本次配置的参数字典（JSON格式），连接到通用训练组件的Algorithm输入
         readme: 算法说明
     """
-    # 构建参数字典
+    # 构建参数字典（normalize 已在新版 sklearn 移除，默认不写入）
     params = {
         'algorithm': 'ridge',
         'alpha': float(alpha),
         'fit_intercept': bool(fit_intercept),
-        'normalize': bool(normalize),
         'solver': str(solver),
         'tol': float(tol)
     }
+    if normalize:
+        params['normalize'] = True
     
     if max_iter is not None:
         params['max_iter'] = int(max_iter)

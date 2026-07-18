@@ -9,35 +9,32 @@
 
 ## 在你的 Rhino 电脑上安装（推荐）
 
-### Windows
+> 云端无法替你打开 Rhino 界面；请在**你的电脑**上执行下面一步，即可加载插件。
 
-1. 解压 `SimpleML-1.2.0.zip`
-2. 将整个 `SimpleML-1.2.0` 文件夹复制到：
-   ```
-   %APPDATA%\Grasshopper\Libraries\SimpleML\
-   ```
-   最终应有：
-   ```
-   ...\Libraries\SimpleML\SimpleML.gha
-   ...\Libraries\SimpleML\myML\components\
-   ...\Libraries\SimpleML\myML\core\
-   ```
-3. 安装 Python 依赖（与 Grasshopper 使用同一 Python）：
-   ```bat
-   python -m pip install -r myML\requirements.txt
-   ```
-4. **完全退出并重启 Rhino** → 打开 Grasshopper → 运行 **环境体检**
+### Windows（一键）
 
-### macOS
+1. 把整个 `releases/` 文件夹拷到本机（或只拷 zip + bat）
+2. 双击 **`install_on_rhino_pc.bat`**
+3. **完全退出并重启 Rhino** → Grasshopper → 运行 **环境体检**
 
-1. 解压 zip
-2. 复制到（按你的 Rhino 版本选一个）：
-   ```
-   ~/Library/Application Support/McNeel/Rhinoceros/7.0/Plug-ins/Grasshopper/Libraries/SimpleML/
-   ~/Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper/Libraries/SimpleML/
-   ```
-3. `python3 -m pip install -r myML/requirements.txt`
-4. 重启 Rhino → **环境体检**
+### macOS（一键）
+
+```bash
+cd releases
+chmod +x install_on_rhino_pc.sh
+./install_on_rhino_pc.sh
+```
+
+然后重启 Rhino → **环境体检**。
+
+### 手动（可选）
+
+解压 `SimpleML-1.2.0.zip`，复制到：
+
+- Windows: `%APPDATA%\Grasshopper\Libraries\SimpleML\`
+- macOS: `~/Library/Application Support/McNeel/Rhinoceros/7.0|8.0/Plug-ins/Grasshopper/Libraries/SimpleML/`
+
+再执行 `pip install -r myML/requirements.txt`。
 
 ## 从源码重新编译（可选）
 

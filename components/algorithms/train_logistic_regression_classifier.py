@@ -25,7 +25,7 @@ except Exception:
 
 
 def train_logistic_regression_classifier(penalty='l2', C=1.0, solver='lbfgs',
-                                        max_iter=100, tol=1e-4, multi_class='auto',
+                                        max_iter=100, tol=1e-4, multi_class=None,
                                         random_state=None, l1_ratio=None,
                                         class_weight=None):
     """
@@ -37,7 +37,7 @@ def train_logistic_regression_classifier(penalty='l2', C=1.0, solver='lbfgs',
         solver: 优化算法，默认"lbfgs"（可选：lbfgs, liblinear, newton-cg, sag, saga）
         max_iter: 最大迭代次数，默认100
         tol: 停止训练的容差，默认1e-4
-        multi_class: 多分类策略，默认"auto"（可选：ovr, multinomial, auto）
+        multi_class: 已弃用（sklearn>=1.5 移除）；传入时仅在旧版 sklearn 生效
         random_state: 随机种子，默认None
         l1_ratio: Elastic-Net混合参数，默认None（仅用于elasticnet惩罚）
         class_weight: 类别权重，默认None（可选：balanced）
@@ -46,7 +46,7 @@ def train_logistic_regression_classifier(penalty='l2', C=1.0, solver='lbfgs',
         algorithm_params: 本次配置的参数字典（JSON格式），连接到通用训练组件的Algorithm输入
         readme: 算法说明
     """
-    # 构建参数字典
+    # 构建参数字典（不默认写入 multi_class，兼容 sklearn 1.5+）
     params = {
         'algorithm': 'logistic_regression',
         'penalty': str(penalty) if penalty is not None else None,
@@ -54,8 +54,9 @@ def train_logistic_regression_classifier(penalty='l2', C=1.0, solver='lbfgs',
         'solver': str(solver),
         'max_iter': int(max_iter),
         'tol': float(tol),
-        'multi_class': str(multi_class)
     }
+    if multi_class is not None:
+        params['multi_class'] = str(multi_class)
     
     if random_state is not None:
         params['random_state'] = int(random_state)

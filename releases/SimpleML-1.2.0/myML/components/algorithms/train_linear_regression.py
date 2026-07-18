@@ -39,13 +39,14 @@ def train_linear_regression(fit_intercept=True, normalize=False,
         algorithm_params: 本次配置的参数字典（JSON格式），连接到通用训练组件的Algorithm输入
         readme: 算法说明
     """
-    # 构建参数字典
+    # 构建参数字典（normalize 已弃用，默认不写入）
     params = {
         'algorithm': 'linear_regression',
         'fit_intercept': bool(fit_intercept),
-        'normalize': bool(normalize),
         'copy_X': bool(copy_X)
     }
+    if normalize:
+        params['normalize'] = True
     
     if n_jobs is not None:
         params['n_jobs'] = int(n_jobs)

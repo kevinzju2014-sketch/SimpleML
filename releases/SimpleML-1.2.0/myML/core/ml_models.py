@@ -3,6 +3,9 @@
 提供各种机器学习算法的封装
 """
 
+import inspect
+import warnings
+
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.svm import SVC, SVR
@@ -17,6 +20,33 @@ from sklearn.metrics import (
     r2_score, mean_squared_error, mean_absolute_error,
     confusion_matrix, classification_report
 )
+
+
+def _filter_estimator_kwargs(model_class, kwargs):
+    """Drop kwargs unsupported by the current sklearn estimator (version-safe)."""
+    try:
+        sig = inspect.signature(model_class.__init__)
+        allowed = set(sig.parameters.keys()) - {"self"}
+        # Some estimators accept **kwargs; keep all in that case
+        if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()):
+            return dict(kwargs)
+    except (TypeError, ValueError):
+        return dict(kwargs)
+
+    kept = {}
+    dropped = []
+    for k, v in kwargs.items():
+        if k in allowed:
+            kept[k] = v
+        else:
+            dropped.append(k)
+    if dropped:
+        warnings.warn(
+            f"{model_class.__name__} 忽略不受支持的参数: {', '.join(dropped)}",
+            UserWarning,
+            stacklevel=3,
+        )
+    return kept
 
 
 class MLModelManager:
@@ -139,7 +169,8 @@ class MLModelManager:
         # 处理algorithm_type参数（用于KNN等算法，避免与我们的algorithm键冲突）
         if 'algorithm_type' in kwargs:
             kwargs['algorithm'] = kwargs.pop('algorithm_type')
-        
+
+        kwargs = _filter_estimator_kwargs(model_class, kwargs)
         self.model = model_class(**kwargs)
         self.model.fit(X, y)
         self.model_type = 'classification'
@@ -197,7 +228,8 @@ class MLModelManager:
         # 处理algorithm_type参数（用于KNN等算法，避免与我们的algorithm键冲突）
         if 'algorithm_type' in kwargs:
             kwargs['algorithm'] = kwargs.pop('algorithm_type')
-        
+
+        kwargs = _filter_estimator_kwargs(model_class, kwargs)
         self.model = model_class(**kwargs)
         self.model.fit(X, y)
         self.model_type = 'regression'
@@ -233,7 +265,8 @@ class MLModelManager:
         if algorithm in ['kmeans', 'agglomerative']:
             if 'n_clusters' not in kwargs:
                 kwargs['n_clusters'] = n_clusters
-        
+
+        kwargs = _filter_estimator_kwargs(model_class, kwargs)
         self.model = model_class(**kwargs)
         self.model.fit(X)
         self.model_type = 'clustering'

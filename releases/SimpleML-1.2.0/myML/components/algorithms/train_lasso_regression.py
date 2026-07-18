@@ -44,17 +44,18 @@ def train_lasso_regression(alpha=1.0, fit_intercept=True, normalize=False,
         algorithm_params: 本次配置的参数字典（JSON格式），连接到通用训练组件的Algorithm输入
         readme: 算法说明
     """
-    # 构建参数字典
+    # 构建参数字典（normalize 已弃用，默认不写入）
     params = {
         'algorithm': 'lasso',
         'alpha': float(alpha),
         'fit_intercept': bool(fit_intercept),
-        'normalize': bool(normalize),
         'max_iter': int(max_iter),
         'tol': float(tol),
         'selection': str(selection),
         'warm_start': bool(warm_start)
     }
+    if normalize:
+        params['normalize'] = True
     
     if random_state is not None:
         params['random_state'] = int(random_state)
