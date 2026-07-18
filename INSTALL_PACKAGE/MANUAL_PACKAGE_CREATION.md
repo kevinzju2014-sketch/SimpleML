@@ -143,7 +143,7 @@ See `Docs/` folder for detailed documentation.
 
 ## System Requirements
 
-- Rhino 8
+- Rhino 7 及以上（含 Rhino 8；Windows / macOS）
 - Grasshopper
 - Python 3.7+
 - See `Install/requirements.txt` for Python dependencies

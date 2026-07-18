@@ -48,37 +48,36 @@ namespace SimpleML.Core
             string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             var candidates = new List<string>();
 
-            // Rhino Code Python（跨平台）
-            string[] rhinoVersions = { "py39-rh8", "py310-rh8", "py311-rh8", "py312-rh8", "py313-rh8" };
-            foreach (string ver in rhinoVersions)
+            // Rhino Code CPython（Rhino 8+；按当前主版本优先，并兼容 rh7/rh8/rh9…）
+            foreach (string envDir in RhinoCompat.EnumerateRhinocodeEnvDirs())
             {
-                candidates.Add(Path.Combine(home, ".rhinocode", ver, IsWindows() ? "python.exe" : "python"));
-                candidates.Add(Path.Combine(home, ".rhinocode", ver, "bin", "python3"));
-                candidates.Add(Path.Combine(home, ".rhinocode", ver, "bin", "python"));
+                string py = RhinoCompat.FindPythonInEnvDir(envDir);
+                if (!string.IsNullOrEmpty(py))
+                    candidates.Add(py);
             }
 
-            // macOS Application Support
-            candidates.Add(Path.Combine(home, "Library", "Application Support", "McNeel", "Rhinoceros", ".rhinocode", "py39-rh8", "python"));
-
-            if (IsWindows())
+            // 系统 Python：Rhino 7 与 macOS 的主要来源
+            if (RhinoCompat.IsWindows)
             {
                 string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 string[] pyVers = { "Python313", "Python312", "Python311", "Python310", "Python39" };
                 foreach (string v in pyVers)
                 {
                     candidates.Add(Path.Combine(local, "Programs", "Python", v, "python.exe"));
-                    candidates.Add(@"C:\" + v + @"\python.exe");
+                    candidates.Add(Path.Combine("C:\\", v, "python.exe"));
                     candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), v, "python.exe"));
                 }
             }
             else
             {
-                candidates.Add("/usr/bin/python3");
-                candidates.Add("/usr/local/bin/python3");
+                // macOS / Unix：Homebrew（Apple Silicon + Intel）与常见路径
                 candidates.Add("/opt/homebrew/bin/python3");
+                candidates.Add("/usr/local/bin/python3");
+                candidates.Add("/usr/bin/python3");
                 candidates.Add("/usr/bin/python");
                 candidates.Add(Path.Combine(home, "miniconda3", "bin", "python"));
                 candidates.Add(Path.Combine(home, "anaconda3", "bin", "python"));
+                candidates.Add(Path.Combine(home, "mambaforge", "bin", "python"));
             }
 
             foreach (string path in candidates)
@@ -91,7 +90,7 @@ namespace SimpleML.Core
             }
 
             // PATH 查找
-            string fromPath = FindOnPath(IsWindows() ? "python" : "python3")
+            string fromPath = FindOnPath(RhinoCompat.IsWindows ? "python" : "python3")
                               ?? FindOnPath("python");
             if (!string.IsNullOrEmpty(fromPath))
             {
@@ -100,14 +99,16 @@ namespace SimpleML.Core
             }
 
             throw new Exception(
-                "未找到 Python。请安装 Python 3.9+，或设置 PYTHON_PATH 指向解释器。\n" +
-                "Windows: 可使用 Rhino Code Python（%USERPROFILE%\\.rhinocode\\...）\n" +
-                "macOS/Linux: 确保 python3 在 PATH 中。");
+                "未找到 Python。请安装 Python 3.9+，或设置 PYTHON_PATH。\n" +
+                "兼容：Rhino 7+（Windows / macOS）。\n" +
+                "Rhino 8+：可使用 Rhinocode（~/.rhinocode/py*-rh*）。\n" +
+                "Rhino 7 / macOS：推荐系统或 Homebrew 的 python3。\n" +
+                "当前环境：" + RhinoCompat.DescribeCompatibility());
         }
 
         private static bool IsWindows()
         {
-            return Environment.OSVersion.Platform == PlatformID.Win32NT;
+            return RhinoCompat.IsWindows;
         }
 
         private static string FindOnPath(string command)

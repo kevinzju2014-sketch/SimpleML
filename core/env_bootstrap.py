@@ -1,6 +1,6 @@
 """
-跨平台环境引导：自动发现 Rhino / 系统 Python 的 site-packages。
-避免写死用户名或 Windows 绝对路径。
+跨平台环境引导：自动发现 Rhino 7+ / Rhino 8+ / macOS 的 site-packages。
+避免写死用户名、单一 py39-rh8 或 Windows 绝对路径。
 """
 
 from __future__ import annotations
@@ -28,23 +28,23 @@ def _unique_existing(paths: Iterable[str]) -> List[str]:
 
 
 def iter_rhinocode_roots() -> List[Path]:
-    """返回可能的 .rhinocode 根目录（跨平台）。"""
+    """返回可能的 .rhinocode 根目录（Windows / macOS）。"""
     roots = []
     home = Path.home()
     roots.append(home / ".rhinocode")
 
-    # Windows 额外常见位置
-    appdata = os.environ.get("APPDATA")
-    localappdata = os.environ.get("LOCALAPPDATA")
-    userprofile = os.environ.get("USERPROFILE")
-    for base in (appdata, localappdata, userprofile):
+    for base in (
+        os.environ.get("APPDATA"),
+        os.environ.get("LOCALAPPDATA"),
+        os.environ.get("USERPROFILE"),
+    ):
         if base:
             roots.append(Path(base) / ".rhinocode")
 
-    # macOS Rhino 有时把 Python 放在 Application Support
+    # macOS Rhino / Rhinocode 常见位置
     roots.append(home / "Library" / "Application Support" / "McNeel" / "Rhinoceros" / ".rhinocode")
+    roots.append(home / "Library" / "Application Support" / ".rhinocode")
 
-    # 去重并保持顺序
     unique = []
     seen = set()
     for r in roots:
@@ -55,49 +55,66 @@ def iter_rhinocode_roots() -> List[Path]:
     return unique
 
 
+def _python_lib_site_packages(env_root: Path) -> List[Path]:
+    """枚举环境内可能的 site-packages（含多 Python 小版本）。"""
+    found = []
+    lib = env_root / "lib"
+    if lib.is_dir():
+        try:
+            for child in lib.iterdir():
+                if child.is_dir() and child.name.startswith("python"):
+                    sp = child / "site-packages"
+                    if sp.is_dir():
+                        found.append(sp)
+        except OSError:
+            pass
+    for candidate in (
+        env_root / "Lib" / "site-packages",
+        env_root / "lib" / "site-packages",
+        env_root / "site-packages",
+    ):
+        if candidate.is_dir():
+            found.append(candidate)
+    return found
+
+
 def discover_site_env_dirs() -> List[str]:
-    """发现 Rhinocode site-envs 虚拟环境目录。"""
+    """发现 Rhinocode site-envs / 环境目录（rh7/rh8/rh9…）。"""
     found = []
     for root in iter_rhinocode_roots():
         if not root.exists():
             continue
-        # py39-rh8 / py311-rh8 / ...
-        for child in sorted(root.iterdir()):
+        try:
+            children = sorted(root.iterdir(), key=lambda p: p.name, reverse=True)
+        except OSError:
+            continue
+        for child in children:
             if not child.is_dir():
                 continue
             site_envs = child / "site-envs"
             if site_envs.is_dir():
                 found.append(str(site_envs))
-            # 有些布局直接把 site-packages 放在环境根下
-            for candidate in (
-                child / "lib" / "python3.9" / "site-packages",
-                child / "lib" / "python3.10" / "site-packages",
-                child / "lib" / "python3.11" / "site-packages",
-                child / "lib" / "python3.12" / "site-packages",
-                child / "Lib" / "site-packages",
-                child / "site-packages",
-            ):
-                if candidate.is_dir():
-                    found.append(str(candidate))
+            for sp in _python_lib_site_packages(child):
+                found.append(str(sp))
     return _unique_existing(found)
 
 
 def expand_site_env_packages(site_envs_dirs: Iterable[str]) -> List[str]:
     packages = []
     for site_envs in site_envs_dirs:
+        # 既可能是 site-envs 父目录，也可能已是 site-packages
+        base = Path(site_envs)
+        if base.name == "site-packages":
+            packages.append(str(base))
+            continue
         try:
             for item in os.listdir(site_envs):
                 env_path = os.path.join(site_envs, item)
                 if not os.path.isdir(env_path):
                     continue
                 packages.append(env_path)
-                for sub in (
-                    os.path.join(env_path, "Lib", "site-packages"),
-                    os.path.join(env_path, "lib", "site-packages"),
-                    os.path.join(env_path, "site-packages"),
-                ):
-                    if os.path.isdir(sub):
-                        packages.append(sub)
+                for sp in _python_lib_site_packages(Path(env_path)):
+                    packages.append(str(sp))
         except OSError:
             continue
     return _unique_existing(packages)

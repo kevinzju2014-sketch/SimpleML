@@ -82,6 +82,11 @@ print('OUTPUT_4:' + (result.get('project_dir') or ''))
                 string py = PythonBridge.ExtractValue(output, "OUTPUT_3:");
                 string root = PythonBridge.ExtractValue(output, "OUTPUT_4:");
 
+                string compat = RhinoCompat.DescribeCompatibility();
+                if (!string.IsNullOrEmpty(report))
+                    report = compat + "\n" + report;
+                summary = compat + " | " + summary;
+
                 DA.SetData(0, status);
                 DA.SetData(1, summary);
                 DA.SetData(2, report);

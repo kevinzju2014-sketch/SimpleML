@@ -107,7 +107,7 @@ try:
         if sp not in sys.path:
             sys.path.insert(0, sp)
     
-    rhino_site_envs = str(__import__('pathlib').Path.home() / '.rhinocode' / 'py39-rh8' / 'site-envs')
+    rhino_site_envs = str(next((p for root in [__import__('pathlib').Path.home()/'.rhinocode', __import__('pathlib').Path.home()/'Library'/'Application Support'/'McNeel'/'Rhinoceros'/'.rhinocode'] if root.exists() for p in root.glob('py*-rh*/site-envs') if p.is_dir()), __import__('pathlib').Path.home()/'.rhinocode'/'site-envs'))
     if os.path.exists(rhino_site_envs):
         for item in os.listdir(rhino_site_envs):
             env_path = os.path.join(rhino_site_envs, item)

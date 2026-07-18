@@ -47,7 +47,7 @@ pip install scikit-learn numpy pandas joblib openpyxl
 
 ## 系统要求
 
-- Rhino 8
+- Rhino 7 及以上（含 Rhino 8；Windows / macOS）
 - Grasshopper
 - Python 3.7+
 - scikit-learn >= 1.0.0

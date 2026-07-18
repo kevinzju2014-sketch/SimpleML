@@ -192,7 +192,7 @@ print("SimpleML installed successfully!")
 ## 系统要求
 
 - **操作系统**: Windows 10+, macOS 10.14+, Linux
-- **Rhino**: Rhino 8
+- **Rhino**: Rhino 7 及以上（含 Rhino 8；Windows / macOS）
 - **Grasshopper**: 最新版本
 - **Python**: 3.7 或更高版本
 - **依赖库**: 见 `Install/requirements.txt`

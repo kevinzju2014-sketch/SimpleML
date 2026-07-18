@@ -1,5 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!--
+    兼容原则：
+    - 目标框架 net48：Rhino 7 / 8 / 更新版本（Windows + Mac）通用
+    - 默认优先引用 Rhino 7 程序集（向前兼容到 Rhino 8+）
+    - 可用 /p:RhinoMajorVersion=7|8|9 或 /p:RhinoSystemDir=... 覆盖
+  -->
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -7,15 +13,12 @@
     <RootNamespace>SimpleML</RootNamespace>
     <AssemblyName>SimpleML</AssemblyName>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
-    <!-- 可通过 /p:RhinoSystemDir=... 覆盖 Rhino 安装路径 -->
-    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">C:\Program Files\Rhino 8\System</RhinoSystemDir>
-    <RhinoGrasshopperDir Condition="'$(RhinoGrasshopperDir)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">C:\Program Files\Rhino 8\Plug-ins\Grasshopper</RhinoGrasshopperDir>
-    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and !$([MSBuild]::IsOSPlatform('Windows'))">/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</RhinoSystemDir>
-    <RhinoGrasshopperDir Condition="'$(RhinoGrasshopperDir)' == '' and !$([MSBuild]::IsOSPlatform('Windows'))">/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources/Plug-ins/Grasshopper</RhinoGrasshopperDir>
+    <!-- auto | 7 | 8 | 9 ...；auto 优先 Rhino 7（最大兼容），否则取已安装的最高版本 -->
+    <RhinoMajorVersion Condition="'$(RhinoMajorVersion)' == ''">auto</RhinoMajorVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -24,20 +27,70 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
+  <!-- Windows 候选路径 -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <_Rh7Sys>C:\Program Files\Rhino 7\System</_Rh7Sys>
+    <_Rh7Gh>C:\Program Files\Rhino 7\Plug-ins\Grasshopper</_Rh7Gh>
+    <_Rh8Sys>C:\Program Files\Rhino 8\System</_Rh8Sys>
+    <_Rh8Gh>C:\Program Files\Rhino 8\Plug-ins\Grasshopper</_Rh8Gh>
+    <_Rh9Sys>C:\Program Files\Rhino 9\System</_Rh9Sys>
+    <_Rh9Gh>C:\Program Files\Rhino 9\Plug-ins\Grasshopper</_Rh9Gh>
+  </PropertyGroup>
+
+  <!-- macOS 候选路径 -->
+  <PropertyGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
+    <_Rh7Sys>/Applications/Rhino 7.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</_Rh7Sys>
+    <_Rh7Gh>/Applications/Rhino 7.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources/ManagedPlugIns/GrasshopperPlugin.rhp/Contents</_Rh7Gh>
+    <_Rh7GhAlt>/Applications/Rhino 7.app/Contents/Resources/ManagedPlugIns/GrasshopperPlugin.rhp/Contents</_Rh7GhAlt>
+    <_Rh8Sys>/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</_Rh8Sys>
+    <_Rh8Gh>/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources/ManagedPlugIns/GrasshopperPlugin.rhp/Contents</_Rh8Gh>
+    <_Rh9Sys>/Applications/Rhino 9.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</_Rh9Sys>
+    <_Rh9Gh>/Applications/Rhino 9.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources/ManagedPlugIns/GrasshopperPlugin.rhp/Contents</_Rh9Gh>
+  </PropertyGroup>
+
+  <!-- 解析实际使用的 Rhino 路径 -->
+  <PropertyGroup Condition="'$(RhinoSystemDir)' == ''">
+    <!-- 显式主版本 -->
+    <RhinoSystemDir Condition="'$(RhinoMajorVersion)' == '7' and Exists('$(_Rh7Sys)/RhinoCommon.dll')">$(_Rh7Sys)</RhinoSystemDir>
+    <RhinoGrasshopperDir Condition="'$(RhinoMajorVersion)' == '7' and '$(RhinoGrasshopperDir)' == ''">$(_Rh7Gh)</RhinoGrasshopperDir>
+    <RhinoSystemDir Condition="'$(RhinoMajorVersion)' == '8' and Exists('$(_Rh8Sys)/RhinoCommon.dll')">$(_Rh8Sys)</RhinoSystemDir>
+    <RhinoGrasshopperDir Condition="'$(RhinoMajorVersion)' == '8' and '$(RhinoGrasshopperDir)' == ''">$(_Rh8Gh)</RhinoGrasshopperDir>
+    <RhinoSystemDir Condition="'$(RhinoMajorVersion)' == '9' and Exists('$(_Rh9Sys)/RhinoCommon.dll')">$(_Rh9Sys)</RhinoSystemDir>
+    <RhinoGrasshopperDir Condition="'$(RhinoMajorVersion)' == '9' and '$(RhinoGrasshopperDir)' == ''">$(_Rh9Gh)</RhinoGrasshopperDir>
+
+    <!-- auto：优先 Rhino 7（向前兼容），否则 8，再否则 9 -->
+    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and Exists('$(_Rh7Sys)/RhinoCommon.dll')">$(_Rh7Sys)</RhinoSystemDir>
+    <RhinoGrasshopperDir Condition="'$(RhinoGrasshopperDir)' == '' and Exists('$(_Rh7Sys)/RhinoCommon.dll')">$(_Rh7Gh)</RhinoGrasshopperDir>
+    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and Exists('$(_Rh8Sys)/RhinoCommon.dll')">$(_Rh8Sys)</RhinoSystemDir>
+    <RhinoGrasshopperDir Condition="'$(RhinoGrasshopperDir)' == '' and Exists('$(_Rh8Sys)/RhinoCommon.dll')">$(_Rh8Gh)</RhinoGrasshopperDir>
+    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == '' and Exists('$(_Rh9Sys)/RhinoCommon.dll')">$(_Rh9Sys)</RhinoSystemDir>
+    <RhinoGrasshopperDir Condition="'$(RhinoGrasshopperDir)' == '' and Exists('$(_Rh9Sys)/RhinoCommon.dll')">$(_Rh9Gh)</RhinoGrasshopperDir>
+  </PropertyGroup>
+
+  <!-- Mac Grasshopper 路径回退 -->
+  <PropertyGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(RhinoGrasshopperDir)' != '' and !Exists('$(RhinoGrasshopperDir)/Grasshopper.dll') and Exists('$(_Rh7GhAlt)/Grasshopper.dll')">
+    <RhinoGrasshopperDir>$(_Rh7GhAlt)</RhinoGrasshopperDir>
+  </PropertyGroup>
+
+  <Target Name="PrintRhinoRefs" BeforeTargets="ResolveAssemblyReferences">
+    <Message Importance="high" Text="SimpleML build target: net48 | RhinoMajorVersion=$(RhinoMajorVersion)" />
+    <Message Importance="high" Text="RhinoCommon: $(RhinoSystemDir)" />
+    <Message Importance="high" Text="Grasshopper: $(RhinoGrasshopperDir)" />
+    <Warning Condition="'$(RhinoSystemDir)' == '' or !Exists('$(RhinoSystemDir)/RhinoCommon.dll')"
+             Text="未找到 RhinoCommon.dll。请安装 Rhino 7+，或传入 /p:RhinoSystemDir=... 与 /p:RhinoGrasshopperDir=..." />
+  </Target>
+
   <ItemGroup>
     <Reference Include="Grasshopper">
-      <HintPath>$(RhinoGrasshopperDir)\Grasshopper.dll</HintPath>
-      <HintPath Condition="Exists('$(RhinoGrasshopperDir)/Grasshopper.dll')">$(RhinoGrasshopperDir)/Grasshopper.dll</HintPath>
+      <HintPath>$(RhinoGrasshopperDir)/Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="GH_IO">
-      <HintPath>$(RhinoGrasshopperDir)\GH_IO.dll</HintPath>
-      <HintPath Condition="Exists('$(RhinoGrasshopperDir)/GH_IO.dll')">$(RhinoGrasshopperDir)/GH_IO.dll</HintPath>
+      <HintPath>$(RhinoGrasshopperDir)/GH_IO.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RhinoCommon">
-      <HintPath>$(RhinoSystemDir)\RhinoCommon.dll</HintPath>
-      <HintPath Condition="Exists('$(RhinoSystemDir)/RhinoCommon.dll')">$(RhinoSystemDir)/RhinoCommon.dll</HintPath>
+      <HintPath>$(RhinoSystemDir)/RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
