@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainLinearRegressionComponent : GH_Component
     {
         public TrainLinearRegressionComponent()
-          : base("Linear Regression", "LR",
+          : base("线性回归参数 Linear Regression", "线性回归",
               "训练线性回归器",
               "SimpleML", "05 Algorithm")
         {
@@ -202,23 +202,7 @@ Create Dataset → Split Dataset
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
 

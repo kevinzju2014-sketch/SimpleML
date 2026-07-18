@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainDBSCANComponent : GH_Component
     {
         public TrainDBSCANComponent()
-          : base("DBSCAN", "DB",
+          : base("DBSCAN聚类参数 DBSCAN", "DBSCAN",
               "训练DBSCAN聚类",
               "SimpleML", "05 Algorithm")
         {

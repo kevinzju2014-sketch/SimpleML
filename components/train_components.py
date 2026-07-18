@@ -14,27 +14,15 @@ if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
 # 确保Rhino Python的site-packages在路径中
+# 跨平台引导 Rhino / 系统 site-packages
 try:
-    site_packages = site.getsitepackages()
-    for sp in site_packages:
-        if sp not in sys.path:
-            sys.path.insert(0, sp)
-    
-    # 添加Rhino Python的site-envs虚拟环境路径
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
-    if os.path.exists(rhino_site_envs):
-        for item in os.listdir(rhino_site_envs):
-            env_path = os.path.join(rhino_site_envs, item)
-            if os.path.isdir(env_path):
-                if env_path not in sys.path:
-                    sys.path.insert(0, env_path)
-                site_pkg = os.path.join(env_path, 'Lib', 'site-packages')
-                if os.path.exists(site_pkg) and site_pkg not in sys.path:
-                    sys.path.insert(0, site_pkg)
+    from core.env_bootstrap import bootstrap_python_paths
+    bootstrap_python_paths(project_dir)
 except Exception:
     pass
 
 from core.ml_models import MLModelManager
+from core.model_bundle import wrap_trained_model
 from components.dataset_components import Dataset, deconstruct_dataset
 import numpy as np
 import json
@@ -226,7 +214,8 @@ def train_classifier(dataset=None, algorithm='random_forest', X_names=None, y_na
     # 训练模型
     manager = MLModelManager()
     print(f'DEBUG train_classifier: 准备调用 manager.train_classifier, algorithm_name = {repr(algorithm_name)}, algorithm_params = {algorithm_params}', file=sys.stderr)
-    model = manager.train_classifier(X, y, algorithm=algorithm_name, **algorithm_params)
+    raw_model = manager.train_classifier(X, y, algorithm=algorithm_name, **algorithm_params)
+    model = wrap_trained_model(raw_model, "classification", algorithm_name, dataset=dataset)
     
     # 收集模型信息
     n_samples = X.shape[0]
@@ -242,6 +231,7 @@ def train_classifier(dataset=None, algorithm='random_forest', X_names=None, y_na
     model_info_tree.append(["样本数量", str(n_samples)])
     model_info_tree.append(["特征维度", str(n_features)])
     model_info_tree.append(["类别数量", str(n_classes)])
+    model_info_tree.append(["预处理打包", "是" if getattr(model, "preprocessor", None) is not None else "否"])
     
     # 添加类别信息
     if y is not None:
@@ -323,7 +313,8 @@ def train_regressor(dataset=None, algorithm='linear_regression', X_names=None, y
     
     # 训练模型
     manager = MLModelManager()
-    model = manager.train_regressor(X, y, algorithm=algorithm_name, **algorithm_params)
+    raw_model = manager.train_regressor(X, y, algorithm=algorithm_name, **algorithm_params)
+    model = wrap_trained_model(raw_model, "regression", algorithm_name, dataset=dataset)
     
     # 收集模型信息
     n_samples = X.shape[0]
@@ -337,6 +328,7 @@ def train_regressor(dataset=None, algorithm='linear_regression', X_names=None, y
     model_info_tree.append(["模型类型", "回归"])
     model_info_tree.append(["样本数量", str(n_samples)])
     model_info_tree.append(["特征维度", str(n_features)])
+    model_info_tree.append(["预处理打包", "是" if getattr(model, "preprocessor", None) is not None else "否"])
     
     # 添加目标值统计信息
     if y is not None:
@@ -417,7 +409,8 @@ def train_cluster(dataset=None, algorithm='kmeans'):
     
     # 训练模型
     manager = MLModelManager()
-    model = manager.train_cluster(X, algorithm=algorithm_name, **algorithm_params)
+    raw_model = manager.train_cluster(X, algorithm=algorithm_name, **algorithm_params)
+    model = wrap_trained_model(raw_model, "clustering", algorithm_name, dataset=dataset)
     
     # 收集模型信息
     n_samples = X.shape[0]
@@ -425,10 +418,11 @@ def train_cluster(dataset=None, algorithm='kmeans'):
     
     # 获取聚类数量（如果模型支持）
     n_clusters = None
-    if hasattr(model, 'n_clusters_'):
-        n_clusters = model.n_clusters_
-    elif hasattr(model, 'labels_'):
-        n_clusters = len(np.unique(model.labels_))
+    inner = raw_model
+    if hasattr(inner, 'n_clusters_'):
+        n_clusters = inner.n_clusters_
+    elif hasattr(inner, 'labels_'):
+        n_clusters = len(np.unique(inner.labels_))
     elif 'n_clusters' in algorithm_params:
         n_clusters = algorithm_params['n_clusters']
     
@@ -440,6 +434,7 @@ def train_cluster(dataset=None, algorithm='kmeans'):
     model_info_tree.append(["模型类型", "聚类"])
     model_info_tree.append(["样本数量", str(n_samples)])
     model_info_tree.append(["特征维度", str(n_features)])
+    model_info_tree.append(["预处理打包", "是" if getattr(model, "preprocessor", None) is not None else "否"])
     if n_clusters is not None:
         model_info_tree.append(["聚类数量", str(n_clusters)])
     

@@ -22,7 +22,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public VisualizeClusterLabelsComponent()
-          : base("Visualize Cluster Labels", "VizClust",
+          : base("可视化聚类标签 Visualize Cluster Labels", "可视化聚类",
               "根据聚类标签给几何对象着色预览",
               "SimpleML", "08 Visualization")
         {

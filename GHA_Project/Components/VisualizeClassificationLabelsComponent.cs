@@ -22,7 +22,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public VisualizeClassificationLabelsComponent()
-          : base("Visualize Classification Labels", "VizClass",
+          : base("可视化分类标签 Visualize Classification Labels", "可视化分类",
               "根据分类标签给几何对象着色预览",
               "SimpleML", "08 Visualization")
         {

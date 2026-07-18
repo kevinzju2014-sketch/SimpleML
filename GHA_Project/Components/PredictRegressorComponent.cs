@@ -12,7 +12,7 @@ namespace SimpleML.Components.ModelPrediction
     public class PredictRegressorComponent : GH_Component
     {
         public PredictRegressorComponent()
-          : base("Predict Regressor", "PredictReg",
+          : base("预测回归 Predict Regressor", "预测回归",
               "使用训练好的回归模型进行预测",
               "SimpleML", "06 Prediction")
         {
@@ -89,7 +89,7 @@ namespace SimpleML.Components.ModelPrediction
                 pythonCodeBuilder.AppendLine("        if sp not in sys.path:");
                 pythonCodeBuilder.AppendLine("            sys.path.insert(0, sp)");
                 pythonCodeBuilder.AppendLine("    ");
-                pythonCodeBuilder.AppendLine("    rhino_site_envs = r'C:\\Users\\Administrator\\.rhinocode\\py39-rh8\\site-envs'");
+                pythonCodeBuilder.AppendLine("    rhino_site_envs = str(__import__('pathlib').Path.home() / '.rhinocode' / 'py39-rh8' / 'site-envs')");
                 pythonCodeBuilder.AppendLine("    if os.path.exists(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("        for item in os.listdir(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("            env_path = os.path.join(rhino_site_envs, item)");
@@ -262,23 +262,7 @@ Split Dataset (Test Dataset) → Deconstruct Dataset → Labels → Evaluate Reg
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string ExtractValue(string output, string prefix)

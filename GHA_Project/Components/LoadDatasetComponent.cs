@@ -16,7 +16,7 @@ namespace SimpleML.Components.DataInput
     public class LoadDatasetComponent : GH_Component
     {
         public LoadDatasetComponent()
-          : base("Load Dataset", "LoadDS",
+          : base("加载示例数据集 Load Dataset", "加载数据集",
               "加载scikit-learn内置数据集，供测试使用",
               "SimpleML", "01 Input")
         {
@@ -84,7 +84,7 @@ try:
         if sp not in sys.path:
             sys.path.insert(0, sp)
     
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
+    rhino_site_envs = str(__import__('pathlib').Path.home() / '.rhinocode' / 'py39-rh8' / 'site-envs')
     if os.path.exists(rhino_site_envs):
         for item in os.listdir(rhino_site_envs):
             env_path = os.path.join(rhino_site_envs, item)
@@ -246,23 +246,7 @@ print('OUTPUT_2:' + info_str)
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string GetReadmeText()

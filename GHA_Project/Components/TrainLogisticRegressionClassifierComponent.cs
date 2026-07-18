@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainLogisticRegressionClassifierComponent : GH_Component
     {
         public TrainLogisticRegressionClassifierComponent()
-          : base("Logistic Regression Classifier", "LR",
+          : base("逻辑回归分类参数 Logistic Regression", "逻辑回归",
               "训练逻辑回归分类器",
               "SimpleML", "05 Algorithm")
         {
@@ -270,23 +270,7 @@ Train Logistic Regression Classifier (C=10.0) → Algorithm Params C → Train C
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
 

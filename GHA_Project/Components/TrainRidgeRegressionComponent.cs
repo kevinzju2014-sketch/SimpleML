@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainRidgeRegressionComponent : GH_Component
     {
         public TrainRidgeRegressionComponent()
-          : base("Ridge Regression", "Ridge",
+          : base("岭回归参数 Ridge Regression", "岭回归",
               "训练岭回归器",
               "SimpleML", "05 Algorithm")
         {

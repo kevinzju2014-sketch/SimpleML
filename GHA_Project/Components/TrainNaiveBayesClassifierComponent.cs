@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainNaiveBayesClassifierComponent : GH_Component
     {
         public TrainNaiveBayesClassifierComponent()
-          : base("Naive Bayes Classifier", "NB",
+          : base("朴素贝叶斯分类参数 Naive Bayes", "朴素贝叶斯",
               "训练朴素贝叶斯分类器",
               "SimpleML", "05 Algorithm")
         {

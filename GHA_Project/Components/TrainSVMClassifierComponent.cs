@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainSVMClassifierComponent : GH_Component
     {
         public TrainSVMClassifierComponent()
-          : base("SVM Classifier", "SVM",
+          : base("支持向量机分类参数 SVM Classifier", "SVM分类",
               "训练SVM分类器",
               "SimpleML", "05 Algorithm")
         {
@@ -272,23 +272,7 @@ Train SVM Classifier (C=10.0) → Algorithm Params B → Train Classifier → Mo
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         protected override System.Drawing.Bitmap Icon => IconLoader.LoadComponentIcon(nameof(TrainSVMClassifierComponent));

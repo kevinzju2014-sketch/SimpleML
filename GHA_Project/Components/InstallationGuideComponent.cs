@@ -6,20 +6,19 @@ namespace SimpleML.Components.About
 {
     /// <summary>
     /// Installation Guide Component
-    /// 安装指南组件 - 提供插件安装和依赖库安装建议
+    /// 安装指南组件 - 提供插件安装和依赖库安装建议（跨平台）
     /// </summary>
     public class InstallationGuideComponent : GH_Component
     {
         public InstallationGuideComponent()
-          : base("Installation Guide", "InstallGuide",
-              "提供SimpleML插件的安装指南和Python依赖库安装建议",
-              "SimpleML", "07 others")
+          : base("安装指南 Installation Guide", "安装指南",
+              "提供SimpleML插件的跨平台安装指南和Python依赖库安装建议",
+              "SimpleML", "09 Help")
         {
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            // 无输入参数
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -32,147 +31,97 @@ namespace SimpleML.Components.About
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            // 插件安装说明
-            string pluginInstallation = @"SimpleML插件安装说明
+            string pluginInstallation = @"SimpleML 插件安装说明（跨平台）
 ═══════════════════════════════════════════════════════════════
 
-1. 安装位置
-   • 将SimpleML.gha文件复制到Grasshopper的组件文件夹
-   • 默认位置: C:\Users\[用户名]\AppData\Roaming\Grasshopper\UserObjects\
-   • 或者: Grasshopper安装目录\Libraries\
+1. 需要放置的文件
+   • SimpleML.gha（Grasshopper 插件）
+   • myML/ 文件夹（内含 components/ 与 core/）
 
-2. 安装步骤
-   a) 关闭Rhino和Grasshopper
-   b) 复制SimpleML.gha文件到上述位置
-   c) 复制myML文件夹到相同位置（如果未自动复制）
-   d) 重新启动Rhino和Grasshopper
-   e) 在Grasshopper中应该能看到SimpleML标签页
+2. 推荐安装位置
+   Windows:
+   • %APPDATA%\Grasshopper\Libraries\SimpleML\
+   macOS:
+   • ~/Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper/Libraries/SimpleML/
+   也可把 myML 放在与 .gha 同一目录。
 
-3. 验证安装
-   • 在Grasshopper中搜索""Read CSV""组件
-   • 如果能看到组件，说明安装成功
-   • 如果看不到，检查GHA文件是否在正确位置
+3. 安装步骤
+   a) 关闭 Rhino / Grasshopper
+   b) 复制 SimpleML.gha 与 myML 到上述目录
+   c) 重启 Rhino / Grasshopper
+   d) 在组件面板中应看到 SimpleML 标签页
 
-4. 卸载方法
-   • 删除SimpleML.gha文件
-   • 删除myML文件夹（可选）
-   • 重新启动Grasshopper";
+4. 验证
+   • 搜索「环境体检」或「读取CSV」
+   • 运行「环境体检 Health Check」组件，状态应为 PASS
 
-            // Python依赖库要求
-            string pythonRequirements = @"Python依赖库要求
+5. 可选环境变量
+   • SIMPLEML_PATH = myML 根目录（含 components 与 core）
+   • PYTHON_PATH = python/python3 可执行文件
+   • SIMPLEML_TIMEOUT_MS = 超时毫秒（默认 120000）
+   • SIMPLEML_PERSISTENT_PYTHON = 1/0（常驻 Python 会话，默认开）";
+
+            string pythonRequirements = @"Python 依赖要求
 ═══════════════════════════════════════════════════════════════
 
-必需库（必须安装）:
-• pandas >= 1.3.0        - 数据处理
-• numpy >= 1.20.0         - 数值计算
-• scikit-learn >= 1.0.0   - 机器学习算法
+必需:
+• Python 3.9+（推荐 3.9–3.12）
+• scikit-learn >= 1.0
+• numpy >= 1.20
+• pandas >= 1.3
+• joblib >= 1.0
 
-可选库（推荐安装）:
-• openpyxl >= 3.0.0       - Excel文件支持（.xlsx）
-• xlrd >= 2.0.0           - Excel文件支持（.xls）
+可选:
+• openpyxl >= 3.0（Excel .xlsx）
 
-Python版本要求:
-• Python 3.7 或更高版本
-• 推荐使用 Python 3.9 或 3.10
+安装（请对「Grasshopper 实际调用的同一个 Python」执行）:
+  python -m pip install -r requirements.txt
+  # 或
+  python3 -m pip install scikit-learn numpy pandas joblib openpyxl
 
-安装命令（在Rhino Python环境中）:
-pip install pandas numpy scikit-learn openpyxl
+Windows 若使用 Rhino Code Python:
+  通常位于 %USERPROFILE%\.rhinocode\py39-rh8\python.exe
+macOS/Linux:
+  使用 python3，或设置 PYTHON_PATH";
 
-注意: 如果使用Rhino内置的Python环境，可能需要管理员权限";
-
-            // 详细安装步骤
-            string installationSteps = @"详细安装步骤
+            string installationSteps = @"推荐上手路径（5 分钟）
 ═══════════════════════════════════════════════════════════════
 
-步骤1: 安装Python依赖库
-─────────────────────────────────────────────────────────────
-方法A: 使用Rhino Python命令行
-1. 打开Rhino
-2. 在命令行输入: _Python
-3. 输入以下命令:
-   import subprocess
-   subprocess.check_call(['pip', 'install', 'pandas', 'numpy', 'scikit-learn', 'openpyxl'])
+1) 安装依赖（见 Python Requirements）
+2) 放置 .gha + myML，重启 Rhino
+3) 放入「环境体检」组件，Run=true，确认 PASS
+4) 打开 examples/ 中的示例说明，按线连接：
+   加载数据集 → 创建数据集 → 智能训练 → 预测/评估
+5) 进阶调参时再用 05 Algorithm 参数电池 → Train *
 
-方法B: 使用系统Python（如果Rhino使用系统Python）
-1. 打开命令提示符（CMD）或PowerShell
-2. 确保Python在PATH中
-3. 运行: pip install pandas numpy scikit-learn openpyxl
+新手优先使用:
+• 智能训练 Smart Train（04 Model）
+• 环境体检 Health Check（09 Help）";
 
-方法C: 使用Rhino的包管理器（如果可用）
-1. 在Rhino中打开Python编辑器
-2. 使用包管理器安装依赖
-
-步骤2: 验证Python库安装
-─────────────────────────────────────────────────────────────
-在Rhino Python中运行:
-import pandas
-import numpy
-import sklearn
-print('所有库已成功安装')
-
-步骤3: 设置环境变量（可选）
-─────────────────────────────────────────────────────────────
-如果myML文件夹不在默认位置，设置环境变量:
-变量名: SIMPLEML_PATH
-变量值: myML文件夹的完整路径
-例如: D:\Projects\SimpleML\myML
-
-步骤4: 测试插件
-─────────────────────────────────────────────────────────────
-1. 在Grasshopper中创建新文件
-2. 添加""Load Dataset""组件
-3. 设置Dataset Name为""iris""
-4. 如果能够成功加载数据，说明安装成功";
-
-            // 常见问题排查
-            string troubleshooting = @"常见问题排查
+            string troubleshooting = @"常见问题
 ═══════════════════════════════════════════════════════════════
 
-问题1: 组件无法找到myML文件夹
-─────────────────────────────────────────────────────────────
-解决方案:
-• 检查myML文件夹是否在正确位置
-• 设置SIMPLEML_PATH环境变量指向myML文件夹
-• 确保myML文件夹包含components和core子文件夹
+1) 找不到 myML
+   • 确认目录含 components/ 与 core/
+   • 设置 SIMPLEML_PATH
+   • 运行「环境体检」查看 Package Root
 
-问题2: Python库导入错误（ModuleNotFoundError）
-─────────────────────────────────────────────────────────────
-解决方案:
-• 确认已安装所有必需的Python库
-• 检查Python版本是否兼容（需要3.7+）
-• 如果使用虚拟环境，确保Rhino使用的是正确的Python环境
-• 尝试重新安装库: pip install --upgrade pandas numpy scikit-learn
+2) ModuleNotFoundError
+   • 对当前 Python 执行 pip 安装
+   • 用「环境体检」查看 Python 路径是否一致
 
-问题3: Excel文件读取失败
-─────────────────────────────────────────────────────────────
-解决方案:
-• 安装openpyxl库: pip install openpyxl
-• 对于.xls文件，安装xlrd: pip install xlrd
-• 检查Excel文件是否损坏
-• 确保文件路径正确
+3) 训练超时
+   • 增大 SIMPLEML_TIMEOUT_MS（如 300000）
+   • 或减少数据量 / 树数量
 
-问题4: 模型训练失败
-─────────────────────────────────────────────────────────────
-解决方案:
-• 检查数据格式是否正确（Tree结构）
-• 确认数据没有缺失值或已正确处理
-• 检查算法参数是否合理
-• 查看错误信息中的详细提示
+4) 预测结果异常（做了标准化）
+   • v1.1 起预处理会随模型打包；请用同一流程重新训练
 
-问题5: 组件在Grasshopper中不显示
-─────────────────────────────────────────────────────────────
-解决方案:
-• 确认GHA文件在正确位置
-• 检查GHA文件是否损坏
-• 重新启动Rhino和Grasshopper
-• 检查Grasshopper版本是否兼容
+5) macOS 权限 / Gatekeeper
+   • 允许 Rhino 运行未签名插件，或右键打开 .gha 所在目录后重试
 
-问题6: 中文显示乱码
-─────────────────────────────────────────────────────────────
-解决方案:
-• 确保文件编码为UTF-8
-• 检查系统区域设置
-• 在Read CSV/Excel组件中使用UTF-8编码";
+6) 组件没有图标文字
+   • 确认使用本版本 icons 资源重新编译的 SimpleML.gha";
 
             DA.SetData(0, pluginInstallation);
             DA.SetData(1, pythonRequirements);

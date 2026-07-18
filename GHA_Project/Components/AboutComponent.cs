@@ -11,9 +11,9 @@ namespace SimpleML.Components.About
     public class AboutComponent : GH_Component
     {
         public AboutComponent()
-          : base("About", "About",
+          : base("关于 About", "关于",
               "显示SimpleML插件的作者信息和版本信息",
-              "SimpleML", "07 others")
+              "SimpleML", "09 Help")
         {
         }
 
@@ -34,7 +34,7 @@ namespace SimpleML.Components.About
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             DA.SetData(0, "SimpleML");
-            DA.SetData(1, "1.0.0");
+            DA.SetData(1, "1.1.0");
             DA.SetData(2, "参数化凯通学/B站/犀流堂/小红书同名账号");
             DA.SetData(3, "基于scikit-learn的Grasshopper机器学习插件，提供完整的机器学习工作流程，包括数据输入、预处理、模型训练、预测和评估功能。");
             DA.SetData(4, "邮箱：zhao_guijia@outlook.com\nB站主页：https://space.bilibili.com/387841705?spm_id_from=333.1007.0.0\n小红书主页：https://xhslink.com/m/8TiSSoH3TuS\n商务合作请联系邮箱，承接教学/程序定制/3d打印开发等业务");

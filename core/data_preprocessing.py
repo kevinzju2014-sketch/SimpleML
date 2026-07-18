@@ -14,6 +14,8 @@ class DataPreprocessor:
     def __init__(self):
         self.scaler = None
         self.scaler_type = None
+        self.imputer = None
+        self.missing_strategy = None
     
     def normalize(self, X, method='standard'):
         """
@@ -44,19 +46,14 @@ class DataPreprocessor:
     
     def transform(self, X):
         """
-        使用已拟合的标准化器转换数据
-        
-        参数:
-            X: 输入数据
-        
-        返回:
-            转换后的数据
+        使用已拟合的缺失值填充器与标准化器转换新数据（预测阶段）。
         """
-        if self.scaler is None:
-            raise ValueError("标准化器尚未拟合，请先调用 normalize 方法")
-        
-        X = np.array(X)
-        return self.scaler.transform(X)
+        X = np.array(X, dtype=float)
+        if self.imputer is not None:
+            X = self.imputer.transform(X)
+        if self.scaler is not None:
+            X = self.scaler.transform(X)
+        return X
     
     def split_data(self, X, y, test_size=0.2, random_state=42):
         """
@@ -96,8 +93,11 @@ class DataPreprocessor:
             mask = ~np.isnan(X).any(axis=1)
             return X[mask]
         else:
-            imputer = SimpleImputer(strategy=strategy)
-            return imputer.fit_transform(X)
+            # mode -> most_frequent
+            sk_strategy = 'most_frequent' if strategy == 'mode' else strategy
+            self.imputer = SimpleImputer(strategy=sk_strategy)
+            self.missing_strategy = sk_strategy
+            return self.imputer.fit_transform(X)
     
     def remove_outliers(self, X, method='iqr', factor=1.5):
         """

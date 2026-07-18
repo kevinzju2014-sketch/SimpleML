@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainSVRComponent : GH_Component
     {
         public TrainSVRComponent()
-          : base("SVR", "SVR",
+          : base("支持向量回归参数 SVR", "SVR回归",
               "训练支持向量回归器",
               "SimpleML", "05 Algorithm")
         {

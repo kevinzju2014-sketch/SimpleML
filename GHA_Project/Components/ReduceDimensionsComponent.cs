@@ -22,7 +22,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public ReduceDimensionsComponent()
-          : base("Reduce Dimensions", "ReduceDim",
+          : base("降维 Reduce Dimensions", "降维",
               "将高维数据降维到2D/3D并可视化",
               "SimpleML", "08 Visualization")
         {
@@ -109,7 +109,7 @@ namespace SimpleML.Components.Visualization
                 pythonCodeBuilder.AppendLine("    for sp in site_packages:");
                 pythonCodeBuilder.AppendLine("        if sp not in sys.path:");
                 pythonCodeBuilder.AppendLine("            sys.path.insert(0, sp)");
-                pythonCodeBuilder.AppendLine("    rhino_site_envs = r'C:\\Users\\Administrator\\.rhinocode\\py39-rh8\\site-envs'");
+                pythonCodeBuilder.AppendLine("    rhino_site_envs = str(__import__('pathlib').Path.home() / '.rhinocode' / 'py39-rh8' / 'site-envs')");
                 pythonCodeBuilder.AppendLine("    if os.path.exists(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("        for item in os.listdir(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("            env_path = os.path.join(rhino_site_envs, item)");
@@ -483,23 +483,7 @@ namespace SimpleML.Components.Visualization
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && System.IO.Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (System.IO.Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = System.IO.Path.GetDirectoryName(ghaPath);
-            string relativePath = System.IO.Path.Combine(ghaDir, "myML");
-            if (System.IO.Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string ExtractValue(string output, string prefix)

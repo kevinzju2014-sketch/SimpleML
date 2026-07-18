@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainRandomForestRegressorComponent : GH_Component
     {
         public TrainRandomForestRegressorComponent()
-          : base("Random Forest Regressor", "RFR",
+          : base("随机森林回归参数 Random Forest Regressor", "随机森林回归",
               "训练随机森林回归器",
               "SimpleML", "05 Algorithm")
         {

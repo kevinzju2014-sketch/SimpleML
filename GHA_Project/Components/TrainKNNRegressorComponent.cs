@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainKNNRegressorComponent : GH_Component
     {
         public TrainKNNRegressorComponent()
-          : base("KNN Regressor", "KNNR",
+          : base("K近邻回归参数 KNN Regressor", "KNN回归",
               "训练KNN回归器",
               "SimpleML", "05 Algorithm")
         {

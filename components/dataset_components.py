@@ -15,23 +15,10 @@ if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
 # 确保Rhino Python的site-packages在路径中
+# 跨平台引导 Rhino / 系统 site-packages
 try:
-    site_packages = site.getsitepackages()
-    for sp in site_packages:
-        if sp not in sys.path:
-            sys.path.insert(0, sp)
-    
-    # 添加Rhino Python的site-envs虚拟环境路径
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
-    if os.path.exists(rhino_site_envs):
-        for item in os.listdir(rhino_site_envs):
-            env_path = os.path.join(rhino_site_envs, item)
-            if os.path.isdir(env_path):
-                if env_path not in sys.path:
-                    sys.path.insert(0, env_path)
-                site_pkg = os.path.join(env_path, 'Lib', 'site-packages')
-                if os.path.exists(site_pkg) and site_pkg not in sys.path:
-                    sys.path.insert(0, site_pkg)
+    from core.env_bootstrap import bootstrap_python_paths
+    bootstrap_python_paths(project_dir)
 except Exception:
     pass
 
@@ -163,6 +150,10 @@ class Dataset:
                 else:
                     # 没有标签：只有特征列名
                     self.all_column_names = self.column_names.copy()
+
+            # 预处理器（标准化等），随 Dataset / Model 传递，保证预测一致
+            self.preprocessor = None
+            self.preprocess_info = None
     
     def get_X(self):
         """获取特征数据"""
@@ -175,9 +166,17 @@ class Dataset:
     def has_labels(self):
         """检查是否有标签数据"""
         return self.y is not None
+
+    def set_preprocessor(self, preprocessor, info=None):
+        """附加已拟合的预处理器，供训练打包与预测复用。"""
+        self.preprocessor = preprocessor
+        self.preprocess_info = info
     
     def __repr__(self):
-        return f"Dataset(n_samples={self.n_samples}, n_features={self.n_features}, has_labels={self.has_labels()})"
+        return (
+            f"Dataset(n_samples={self.n_samples}, n_features={self.n_features}, "
+            f"has_labels={self.has_labels()}, has_preprocessor={self.preprocessor is not None})"
+        )
 
 
 def create_dataset(X, y=None, column_names=None, X_names=None, y_names=None, all_column_names=None):
@@ -382,5 +381,10 @@ def split_dataset(dataset, test_size=0.2, random_state=42):
     # 传递列名信息到新的Dataset对象
     train_dataset = Dataset(X_train, y_train, column_names=dataset.column_names, all_column_names=dataset.all_column_names)
     test_dataset = Dataset(X_test, y_test, column_names=dataset.column_names, all_column_names=dataset.all_column_names)
+
+    # 分割后继承同一预处理器（已在完整数据上拟合）
+    if getattr(dataset, "preprocessor", None) is not None:
+        train_dataset.set_preprocessor(dataset.preprocessor, getattr(dataset, "preprocess_info", None))
+        test_dataset.set_preprocessor(dataset.preprocessor, getattr(dataset, "preprocess_info", None))
     
     return train_dataset, test_dataset

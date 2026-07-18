@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainAgglomerativeClusteringComponent : GH_Component
     {
         public TrainAgglomerativeClusteringComponent()
-          : base("Agglomerative Clustering", "AC",
+          : base("层次聚类参数 Agglomerative", "层次聚类",
               "训练层次聚类",
               "SimpleML", "05 Algorithm")
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace SimpleML.Core
 {
     /// <summary>
-    /// 组件名称到图标文件名的映射
+    /// 组件名称到图标文件名的映射（含文字标签图标）
     /// </summary>
     public static class ComponentIconMap
     {
@@ -30,6 +30,7 @@ namespace SimpleML.Core
             { "TrainClassifierComponent", "train_classifier.png" },
             { "TrainRegressorComponent", "train_regressor.png" },
             { "TrainClusterComponent", "train_cluster.png" },
+            { "SmartTrainComponent", "smart_train.png" },
             
             // 算法特定训练组件 - 分类
             { "TrainRandomForestClassifierComponent", "random_forest_classifier.png" },
@@ -61,21 +62,26 @@ namespace SimpleML.Core
             { "EvaluateClassificationComponent", "evaluate_classification.png" },
             { "EvaluateRegressionComponent", "evaluate_regression.png" },
             { "EvaluateClusteringComponent", "evaluate_clustering.png" },
+            { "FeatureImportanceComponent", "feature_importance.png" },
+            { "SilhouetteScoreComponent", "silhouette_score.png" },
             
             // 模型IO组件
             { "SaveModelComponent", "save_model.png" },
             { "LoadModelComponent", "load_model.png" },
+
+            // 可视化
+            { "VisualizeClusterLabelsComponent", "visualize_cluster_labels.png" },
+            { "VisualizeClassificationLabelsComponent", "visualize_classification_labels.png" },
+            { "VisualizeRegressionComponent", "visualize_regression.png" },
+            { "ReduceDimensionsComponent", "reduce_dimensions.png" },
+            { "ElbowMethodComponent", "elbow_method.png" },
             
-            // 其他组件
+            // 帮助
             { "AboutComponent", "about.png" },
             { "InstallationGuideComponent", "installation_guide.png" },
+            { "HealthCheckComponent", "health_check.png" },
         };
 
-        /// <summary>
-        /// 获取组件的图标文件名
-        /// </summary>
-        /// <param name="componentName">组件类名</param>
-        /// <returns>图标文件名，如果未找到返回null</returns>
         public static string GetIconFileName(string componentName)
         {
             if (_iconMap.TryGetValue(componentName, out string iconFileName))

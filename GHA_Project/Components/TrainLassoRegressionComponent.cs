@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainLassoRegressionComponent : GH_Component
     {
         public TrainLassoRegressionComponent()
-          : base("Lasso Regression", "Lasso",
+          : base("Lasso回归参数 Lasso Regression", "Lasso回归",
               "训练Lasso回归器",
               "SimpleML", "05 Algorithm")
         {

@@ -22,7 +22,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public VisualizeRegressionComponent()
-          : base("Visualize Regression", "VizReg",
+          : base("可视化回归 Visualize Regression", "可视化回归",
               "显示预测值 vs 实际值散点图 + 拟合线",
               "SimpleML", "08 Visualization")
         {

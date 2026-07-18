@@ -12,9 +12,9 @@ namespace SimpleML.Components.ModelEvaluation
     public class EvaluateClassificationComponent : GH_Component
     {
         public EvaluateClassificationComponent()
-          : base("Evaluate Classification", "EvalClf",
+          : base("评估分类 Evaluate Classification", "评估分类",
               "评估分类模型",
-              "SimpleML", "06 Prediction")
+              "SimpleML", "07 Evaluation")
         {
         }
 
@@ -86,7 +86,7 @@ namespace SimpleML.Components.ModelEvaluation
                 pythonCodeBuilder.AppendLine("        if sp not in sys.path:");
                 pythonCodeBuilder.AppendLine("            sys.path.insert(0, sp)");
                 pythonCodeBuilder.AppendLine("    ");
-                pythonCodeBuilder.AppendLine("    rhino_site_envs = r'C:\\Users\\Administrator\\.rhinocode\\py39-rh8\\site-envs'");
+                pythonCodeBuilder.AppendLine("    rhino_site_envs = str(__import__('pathlib').Path.home() / '.rhinocode' / 'py39-rh8' / 'site-envs')");
                 pythonCodeBuilder.AppendLine("    if os.path.exists(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("        for item in os.listdir(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("            env_path = os.path.join(rhino_site_envs, item)");
@@ -384,23 +384,7 @@ Train Classifier (Model B) → Evaluate Classification → Metrics B
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string ConvertTreeToPythonList(Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> tree)

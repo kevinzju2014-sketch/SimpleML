@@ -9,7 +9,7 @@ namespace SimpleML.Components.ModelTraining
     public class TrainKMeansComponent : GH_Component
     {
         public TrainKMeansComponent()
-          : base("K-Means", "KM",
+          : base("K均值聚类参数 K-Means", "K均值",
               "训练K-Means聚类",
               "SimpleML", "05 Algorithm")
         {
