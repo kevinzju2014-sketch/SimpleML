@@ -30,14 +30,33 @@
 - 预处理随模型打包；特征重要性 / 轮廓系数
 - 中英双语组件标签与文字图标
 
-## 快速开始
+## 文档（请从这里开始）
 
-1. 安装 Python 依赖（请对 Grasshopper 实际使用的解释器执行）：
+| 文档 | 说明 |
+|------|------|
+| **[docs/INSTALL_GUIDE.md](docs/INSTALL_GUIDE.md)** | 在你的 Rhino 电脑上安装与验收 |
+| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | 详细用户手册与最短工作流 |
+| [docs/COMPONENT_REFERENCE.md](docs/COMPONENT_REFERENCE.md) | 组件一览 |
+| [docs/README.md](docs/README.md) | 文档索引 |
+| [tests/README.md](tests/README.md) | 自动化测试说明 |
+
+## 快速开始（你的 Rhino 电脑）
+
+1. **编译**（需本机已装 Rhino + .NET SDK）：
    ```bash
-   python3 -m pip install -r requirements.txt
+   dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
    ```
-2. 将 `SimpleML.gha` 与本仓库 Python 根目录（含 `components/`、`core/`）放到 Grasshopper Libraries，或设置 `SIMPLEML_PATH`
-3. 重启 Rhino → 运行 **环境体检** → 按 `examples/README.md` 连线
+2. **一键安装**（仓库根目录）：
+   - Windows：双击 `install.bat`
+   - macOS：`chmod +x install.sh && ./install.sh`
+3. 重启 Rhino → Grasshopper → 运行 **环境体检（Health Check）**
+4. 按 [docs/INSTALL_GUIDE.md](docs/INSTALL_GUIDE.md) 验收清单走通鸢尾花流程
+
+或手动：
+
+1. `python3 -m pip install -r requirements.txt`（对 GH 实际使用的解释器）
+2. 将 `SimpleML.gha` 与本仓库根（含 `components/`、`core/`）放到 Grasshopper Libraries，或设置 `SIMPLEML_PATH`
+3. 重启 Rhino → **环境体检** → [examples/README.md](examples/README.md)
 
 ### 安装位置
 
@@ -60,6 +79,14 @@
 | `PYTHON_PATH` | python / python3 可执行文件 |
 | `SIMPLEML_TIMEOUT_MS` | 超时毫秒（默认 120000） |
 | `SIMPLEML_PERSISTENT_PYTHON` | `1`/`0` 常驻会话 |
+
+## 测试
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 tests/test_simpleml.py -v
+python3 examples/quickstart_all.py
+```
 
 ## 编译
 
@@ -101,11 +128,14 @@ dotnet build GHA_Project/SimpleML.csproj -c Release \
 
 ```
 simpleml/
+├── docs/                # 安装指南 / 用户手册 / 组件参考
 ├── components/          # Python 组件 API
 ├── core/                # ML 核心（env_bootstrap / model_bundle）
 ├── GHA_Project/         # C# Grasshopper 插件（RhinoCompat）
-├── examples/            # 示例工作流
-├── INSTALL_PACKAGE/     # 打包相关
+├── examples/            # 示例工作流与快速脚本
+├── tests/               # 自动化测试
+├── install.bat / .sh    # 本机一键安装到 Grasshopper Libraries
+├── yak/                 # PackageManager 清单
 └── requirements.txt
 ```
 

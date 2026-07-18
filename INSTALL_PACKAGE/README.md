@@ -1,5 +1,12 @@
 # SimpleML 插件安装包
 
+> **最新安装请优先阅读仓库根目录文档：**  
+> - [docs/INSTALL_GUIDE.md](../docs/INSTALL_GUIDE.md) — Rhino 本机安装与验收  
+> - [docs/USER_GUIDE.md](../docs/USER_GUIDE.md) — 用户手册  
+> - 根目录 `install.bat` / `install.sh` — 一键部署到 Grasshopper Libraries  
+
+本目录保留历史打包脚本与补充说明；日常安装以根目录脚本 + `docs/` 为准。
+
 ## 安装包内容
 
 本安装包包含：
@@ -12,8 +19,9 @@
 
 ### 方法1: 自动安装（推荐）
 
-1. 双击运行 `install.bat`（Windows）或 `install.sh`（Mac/Linux）
+1. 在**仓库根目录**双击运行 `install.bat`（Windows）或执行 `./install.sh`（Mac/Linux）
 2. 按照提示完成安装
+3. 按 [docs/INSTALL_GUIDE.md](../docs/INSTALL_GUIDE.md) 做验收
 
 ### 方法2: 手动安装
 
