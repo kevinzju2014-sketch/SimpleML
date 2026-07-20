@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataAnalysis
 {
     public class CalculateStatisticsComponent : GH_Component
     {
         public CalculateStatisticsComponent()
-          : base("计算统计 Calculate Statistics", "计算统计",
-              "计算数据的统计信息（均值、标准差、最小值、最大值等）",
+          : base(L.Name("CalculateStatisticsComponent"), L.Nick("CalculateStatisticsComponent"), L.Desc("CalculateStatisticsComponent"),
               "SimpleML", "02 Analysis")
         {
         }
@@ -40,7 +40,7 @@ namespace SimpleML.Components.DataAnalysis
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -148,7 +148,7 @@ print('OUTPUT_2:计算数据的描述性统计（均值、标准差、最小值�
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

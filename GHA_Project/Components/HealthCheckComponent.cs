@@ -3,13 +3,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.About
 {
     public class HealthCheckComponent : GH_Component
     {
         public HealthCheckComponent()
-          : base("环境体检 Health Check", "体检",
-              "检查 SimpleML 运行环境；失败时给出下一步。可选 AutoFix 自动 pip 安装依赖。",
+          : base(L.Name("HealthCheckComponent"), L.Nick("HealthCheckComponent"), L.Desc("HealthCheckComponent"),
               "SimpleML", "09 Help")
         {
         }

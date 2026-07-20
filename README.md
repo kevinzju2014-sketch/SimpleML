@@ -28,6 +28,20 @@ SimpleML/
 └── README.md
 ```
 
+## Language (EN / ZH)
+
+Default: **English**.
+
+Use **SimpleML → 09 Help → Language**:
+
+- Boolean `Chinese`: `false` = English, `true` = Chinese  
+- Or **right-click** the component → `English` / `中文 Chinese`
+
+Canvas component names and explanation texts refresh automatically — **no Rhino restart**.
+
+Preference: `%APPDATA%\Grasshopper\SimpleML\language.txt`  
+Env: `SIMPLEML_LANG=en|zh`
+
 ## 构建插件
 
 需本机安装 Rhino + .NET SDK：

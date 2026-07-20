@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelEvaluation
 {
     public class EvaluateClassificationComponent : GH_Component
     {
         public EvaluateClassificationComponent()
-          : base("评估分类 Evaluate Classification", "评估分类",
-              "评估分类模型",
+          : base(L.Name("EvaluateClassificationComponent"), L.Nick("EvaluateClassificationComponent"), L.Desc("EvaluateClassificationComponent"),
               "SimpleML", "07 Evaluation")
         {
         }
@@ -43,7 +43,7 @@ namespace SimpleML.Components.ModelEvaluation
             if (!DA.GetData(0, ref modelObj)) return;
             if (!DA.GetData(1, ref datasetObj))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "必须提供Test Dataset输入");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.need_test_dataset"));
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace SimpleML.Components.ModelEvaluation
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -377,7 +377,7 @@ Train Classifier (Model B) → Evaluate Classification → Metrics B
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

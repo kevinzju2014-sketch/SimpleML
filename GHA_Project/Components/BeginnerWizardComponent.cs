@@ -4,6 +4,7 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.About
 {
     /// <summary>
@@ -12,8 +13,7 @@ namespace SimpleML.Components.About
     public class BeginnerWizardComponent : GH_Component
     {
         public BeginnerWizardComponent()
-          : base("新手向导 Beginner Wizard", "新手向导",
-              "上架向新手向导：输出分类/回归/聚类完整接线配方，并可选运行体检",
+          : base(L.Name("BeginnerWizardComponent"), L.Nick("BeginnerWizardComponent"), L.Desc("BeginnerWizardComponent"),
               "SimpleML", "09 Help")
         {
         }

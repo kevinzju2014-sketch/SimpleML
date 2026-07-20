@@ -6,6 +6,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataInput
 {
     /// <summary>
@@ -14,8 +15,7 @@ namespace SimpleML.Components.DataInput
     public class LoadDatasetComponent : GH_Component
     {
         public LoadDatasetComponent()
-          : base("加载示例数据集 Load Dataset", "加载数据集",
-              "加载 scikit-learn 示例数据，并直接输出 Dataset（可接智能训练）",
+          : base(L.Name("LoadDatasetComponent"), L.Nick("LoadDatasetComponent"), L.Desc("LoadDatasetComponent"),
               "SimpleML", "01 Input")
         {
         }

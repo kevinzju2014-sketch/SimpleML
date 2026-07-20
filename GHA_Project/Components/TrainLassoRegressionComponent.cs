@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainLassoRegressionComponent : GH_Component
     {
         public TrainLassoRegressionComponent()
-          : base("Lasso回归参数 Lasso Regression", "Lasso回归",
-              "训练Lasso回归器",
+          : base(L.Name("TrainLassoRegressionComponent"), L.Nick("TrainLassoRegressionComponent"), L.Desc("TrainLassoRegressionComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
@@ -91,7 +91,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

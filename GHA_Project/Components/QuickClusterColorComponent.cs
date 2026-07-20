@@ -10,6 +10,7 @@ using Rhino.Geometry;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.Visualization
 {
     /// <summary>
@@ -18,8 +19,7 @@ namespace SimpleML.Components.Visualization
     public class QuickClusterColorComponent : GH_Component
     {
         public QuickClusterColorComponent()
-          : base("一键聚类上色 Quick Cluster Color", "聚类上色",
-              "输入点与聚类模型（或标签），输出着色点。适合快速演示。",
+          : base(L.Name("QuickClusterColorComponent"), L.Nick("QuickClusterColorComponent"), L.Desc("QuickClusterColorComponent"),
               "SimpleML", "08 Visualization")
         {
         }

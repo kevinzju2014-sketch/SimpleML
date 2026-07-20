@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainSVMClassifierComponent : GH_Component
     {
         public TrainSVMClassifierComponent()
-          : base("支持向量机分类参数 SVM Classifier", "SVM分类",
-              "训练SVM分类器",
+          : base(L.Name("TrainSVMClassifierComponent"), L.Nick("TrainSVMClassifierComponent"), L.Desc("TrainSVMClassifierComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
@@ -107,7 +107,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

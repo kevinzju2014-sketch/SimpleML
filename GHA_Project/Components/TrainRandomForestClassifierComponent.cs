@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainRandomForestClassifierComponent : GH_Component
     {
         public TrainRandomForestClassifierComponent()
-          : base("随机森林分类参数 Random Forest Classifier", "随机森林分类",
-              "训练随机森林分类器",
+          : base(L.Name("TrainRandomForestClassifierComponent"), L.Nick("TrainRandomForestClassifierComponent"), L.Desc("TrainRandomForestClassifierComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
@@ -115,7 +115,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

@@ -11,6 +11,7 @@ import sys
 from typing import Dict, List, Tuple
 
 from core.env_bootstrap import bootstrap_python_paths, discover_site_env_dirs, ensure_project_on_path
+from components.i18n import is_zh, t
 
 
 REQUIRED_PACKAGES = [
@@ -46,44 +47,70 @@ def _os_family() -> str:
 
 
 def build_next_steps(status: str, required_failed: List[dict], project_dir: str) -> str:
-    lines = ["下一步（请按顺序）", "=" * 40]
-    if status == "PASS":
-        lines.append("1. 在 Grasshopper 搜索「新手向导」，选择 classification")
-        lines.append("2. 或打开 examples/ 中的配方说明，按线连接")
-        lines.append("3. 推荐链路: 加载示例数据集 → 分割 → 智能训练 → 预测 → 评估")
-        return "\n".join(lines)
+    if is_zh():
+        lines = ["下一步（请按顺序）", "=" * 40]
+        if status == "PASS":
+            lines.append("1. 在 Grasshopper 搜索「新手向导」，选择 classification")
+            lines.append("2. 或打开 examples/ 中的配方说明，按线连接")
+            lines.append("3. 推荐链路: 加载示例数据集 → 分割 → 智能训练 → 预测 → 评估")
+            return "\n".join(lines)
+    else:
+        lines = ["Next steps (in order)", "=" * 40]
+        if status == "PASS":
+            lines.append("1. In Grasshopper search Beginner Wizard, set Task=classification")
+            lines.append("2. Or follow examples/ recipes and wire components")
+            lines.append("3. Recommended: Load Dataset → Split → Smart Train → Predict → Evaluate")
+            return "\n".join(lines)
 
     fam = _os_family()
-    missing_deps = [c for c in required_failed if c["name"].startswith("依赖")]
-    path_fail = [c for c in required_failed if "PATH" in c["name"] or "目录" in c["name"]]
+    missing_deps = [c for c in required_failed if c["name"].startswith("依赖") or c["name"].startswith("Dependency")]
+    path_fail = [c for c in required_failed if "PATH" in c["name"] or "目录" in c["name"] or "folder" in c["name"].lower()]
 
     step = 1
     if path_fail:
-        lines.append(f"{step}. 在 Grasshopper 搜索并打开「安装指南」组件，按平台说明放置 .gha 与 myML")
+        if is_zh():
+            lines.append(f"{step}. 在 Grasshopper 搜索并打开「安装指南」组件，按平台说明放置 .gha 与包路径")
+        else:
+            lines.append(f"{step}. Open Installation Guide in Grasshopper and place .gha + package path")
         step += 1
         if fam == "mac":
-            lines.append(f"{step}. macOS: 把文件放到 Rhinoceros/7.0 或 8.0 的 Grasshopper/Libraries/SimpleML/")
+            lines.append(
+                f"{step}. macOS: put files under Rhinoceros/7.0 or 8.0 Grasshopper/Libraries/SimpleML/"
+                if not is_zh()
+                else f"{step}. macOS: 把文件放到 Rhinoceros/7.0 或 8.0 的 Grasshopper/Libraries/SimpleML/"
+            )
         else:
-            lines.append(f"{step}. Windows: 放到 %APPDATA%\\Grasshopper\\Libraries\\SimpleML\\")
-        step += 1
-        lines.append(f"{step}. 或运行仓库根目录 install.sh / install.bat（会提示复制路径）")
+            lines.append(
+                f"{step}. Windows: %APPDATA%\\Grasshopper\\Libraries\\SimpleML\\"
+                if not is_zh()
+                else f"{step}. Windows: 放到 %APPDATA%\\Grasshopper\\Libraries\\SimpleML\\"
+            )
         step += 1
 
     if missing_deps:
-        lines.append(f"{step}. 缺少 Python 依赖。任选其一：")
-        lines.append("   a) 将「环境体检」的 AutoFix 设为 true（自动 pip）")
-        lines.append("   b) 终端执行:")
+        if is_zh():
+            lines.append(f"{step}. 缺少 Python 依赖。任选其一：")
+            lines.append("   a) 将「环境体检」的 AutoFix 设为 true（自动 pip）")
+            lines.append("   b) 终端执行:")
+        else:
+            lines.append(f"{step}. Missing Python packages. Choose one:")
+            lines.append("   a) Set Health Check AutoFix=true (auto pip)")
+            lines.append("   b) Run in a terminal:")
         lines.append(f"      \"{sys.executable}\" -m pip install scikit-learn numpy pandas joblib openpyxl")
         step += 1
-        if fam == "mac":
-            lines.append(f"{step}. Apple Silicon 可用: /opt/homebrew/bin/python3 -m pip install ...")
-            step += 1
 
-    lines.append(f"{step}. 重新运行「环境体检」，确认 PASS 后再训练")
-    step += 1
-    lines.append(f"{step}. 若仍失败: 打开「安装指南」+ 查看 About 联系方式")
-    if project_dir:
-        lines.append(f"\n当前包路径候选: {project_dir}")
+    if is_zh():
+        lines.append(f"{step}. 重新运行「环境体检」，确认 PASS 后再训练")
+        step += 1
+        lines.append(f"{step}. 若仍失败: 打开「安装指南」+ 查看 About 联系方式")
+        if project_dir:
+            lines.append(f"\n当前包路径候选: {project_dir}")
+    else:
+        lines.append(f"{step}. Re-run Health Check and confirm PASS before training")
+        step += 1
+        lines.append(f"{step}. If it still fails: open Installation Guide + About for contact")
+        if project_dir:
+            lines.append(f"\nPackage path candidate: {project_dir}")
     return "\n".join(lines)
 
 

@@ -8,6 +8,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelPrediction
 {
     /// <summary>
@@ -16,8 +17,7 @@ namespace SimpleML.Components.ModelPrediction
     public class PredictAutoComponent : GH_Component
     {
         public PredictAutoComponent()
-          : base("预测 Predict", "预测",
-              "统一预测：自动识别模型类型。可接 Dataset 或 X。",
+          : base(L.Name("PredictAutoComponent"), L.Nick("PredictAutoComponent"), L.Desc("PredictAutoComponent"),
               "SimpleML", "06 Prediction")
         {
         }
@@ -59,7 +59,7 @@ namespace SimpleML.Components.ModelPrediction
             bool hasX = DA.GetDataTree(2, out xTree) && xTree != null && xTree.DataCount > 0;
             if (!hasDs && !hasX)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "请提供 Dataset 或 X");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.need_dataset_or_x"));
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace SimpleML.Components.ModelPrediction
                 string mymlPath = PathResolver.GetMyMLPath();
                 if (string.IsNullOrEmpty(mymlPath))
                 {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "未找到包路径。请打开「安装指南」或运行安装脚本。");
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.package_missing"));
                     return;
                 }
 

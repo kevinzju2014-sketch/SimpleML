@@ -7,6 +7,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataInput
 {
     /// <summary>
@@ -16,8 +17,7 @@ namespace SimpleML.Components.DataInput
     public class WriteCSVComponent : GH_Component
     {
         public WriteCSVComponent()
-          : base("写入CSV Write CSV", "写入CSV",
-              "将数据写入CSV文件",
+          : base(L.Name("WriteCSVComponent"), L.Nick("WriteCSVComponent"), L.Desc("WriteCSVComponent"),
               "SimpleML", "01 Input")
         {
         }
@@ -77,7 +77,7 @@ namespace SimpleML.Components.DataInput
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -258,7 +258,7 @@ Calculate Statistics → (格式化) → Write CSV
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

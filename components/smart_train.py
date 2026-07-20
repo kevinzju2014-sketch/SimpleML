@@ -12,6 +12,7 @@ import numpy as np
 from components.dataset_components import Dataset
 from components.train_components import train_classifier, train_cluster, train_regressor
 from components.ux_helpers import next_steps_for_model, model_card
+from components.i18n import is_zh, t
 from core.model_bundle import SimpleMLModel
 
 
@@ -97,43 +98,75 @@ def smart_train(
                 pass
 
     explanation = _build_explanation(task_name, algo_name, n_samples, n_features, model)
-    readme = (
-        "Smart Train 一键训练完成。\n"
-        f"任务: {task_name} | 算法: {algo_name}\n"
-        "新手建议: Dataset → Smart Train → 预测 / 评估。\n"
-        "进阶调参: 使用 05 Algorithm 参数电池连接到训练组件。"
-    )
+    if is_zh():
+        readme = (
+            "Smart Train 一键训练完成。\n"
+            f"任务: {task_name} | 算法: {algo_name}\n"
+            "新手建议: Dataset → Smart Train → 预测 / 评估。\n"
+            "进阶调参: 使用 05 Algorithm 参数电池连接到训练组件。"
+        )
+    else:
+        readme = (
+            "Smart Train finished.\n"
+            f"Task: {task_name} | Algorithm: {algo_name}\n"
+            "Beginner path: Dataset → Smart Train → Predict / Evaluate.\n"
+            "Advanced: connect 05 Algorithm parameter batteries to Train components."
+        )
     steps = next_steps_for_model(model)
     card = model_card(model)
     return model, model_info, explanation, readme, steps, card
 
 
 def _build_explanation(task: str, algorithm: str, n_samples: int, n_features: int, model) -> str:
+    if is_zh():
+        lines = [
+            "智能训练说明",
+            "=" * 40,
+            f"识别任务: {task}",
+            f"选用算法: {algorithm}",
+            f"样本数: {n_samples}",
+            f"特征数: {n_features}",
+            "",
+            "为什么选它:",
+        ]
+        tips = {
+            "logistic_regression": "小样本分类默认选逻辑回归，训练快、结果稳，适合快速验证。",
+            "random_forest": "随机森林对噪声和特征尺度较宽容，适合作为通用默认模型。",
+            "linear_regression": "特征少时线性回归直观可解释，便于理解趋势。",
+            "kmeans": "无标签数据默认 K-Means；可用 Elbow Method 帮助选择簇数。",
+            "agglomerative": "层次聚类适合探索不同粒度的分组结构。",
+            "dbscan": "DBSCAN 适合发现不规则形状簇，并自动识别噪声点。",
+        }
+        lines.append(tips.get(str(algorithm), "已按任务类型选择常用稳妥算法。"))
+        if isinstance(model, SimpleMLModel) and model.preprocessor is not None:
+            lines += ["", "预处理: 已随模型打包（预测时会自动套用同一变换）。"]
+        else:
+            lines += ["", "预处理: 未检测到 scaler；若训练前做了标准化，请用同一 Create Dataset 设置。"]
+        lines += ["", "下一步: 连接 Predict 与 Evaluate，查看通俗解读报告。"]
+        return "\n".join(lines)
+
     lines = [
-        "智能训练说明",
+        "Smart Train notes",
         "=" * 40,
-        f"识别任务: {task}",
-        f"选用算法: {algorithm}",
-        f"样本数: {n_samples}",
-        f"特征数: {n_features}",
+        f"Detected task: {task}",
+        f"Chosen algorithm: {algorithm}",
+        f"Samples: {n_samples}",
+        f"Features: {n_features}",
         "",
-        "为什么选它:",
+        "Why this choice:",
     ]
     tips = {
-        "logistic_regression": "小样本分类默认选逻辑回归，训练快、结果稳，适合快速验证。",
-        "random_forest": "随机森林对噪声和特征尺度较宽容，适合作为通用默认模型。",
-        "linear_regression": "特征少时线性回归直观可解释，便于理解趋势。",
-        "kmeans": "无标签数据默认 K-Means；可用 Elbow Method 帮助选择簇数。",
-        "agglomerative": "层次聚类适合探索不同粒度的分组结构。",
-        "dbscan": "DBSCAN 适合发现不规则形状簇，并自动识别噪声点。",
+        "logistic_regression": "Logistic regression is a fast, stable default for small classification problems.",
+        "random_forest": "Random Forest tolerates noise and feature scale well as a general default.",
+        "linear_regression": "Linear regression is interpretable when features are few.",
+        "kmeans": "K-Means is the default for unlabeled data; use Elbow Method to pick K.",
+        "agglomerative": "Agglomerative clustering helps explore groupings at different granularities.",
+        "dbscan": "DBSCAN finds irregular clusters and can mark noise points.",
     }
-    lines.append(tips.get(str(algorithm), "已按任务类型选择常用稳妥算法。"))
+    lines.append(tips.get(str(algorithm), "A common robust algorithm was selected for this task type."))
     if isinstance(model, SimpleMLModel) and model.preprocessor is not None:
-        lines.append("")
-        lines.append("预处理: 已随模型打包（预测时会自动套用同一变换）。")
+        lines += ["", "Preprocessor: packed with the model (applied automatically at predict time)."]
     else:
-        lines.append("")
-        lines.append("预处理: 未检测到 scaler；若训练前做了标准化，请用同一 Create Dataset 设置。")
-    lines.append("")
-    lines.append("下一步: 连接 Predict 与 Evaluate，查看通俗解读报告。")
+        lines += ["", "Preprocessor: no scaler detected; keep Create Dataset settings consistent if you scaled."]
+    lines += ["", "Next: connect Predict and Evaluate to read the plain-language report."]
     return "\n".join(lines)

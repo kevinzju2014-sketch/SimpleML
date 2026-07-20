@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainAgglomerativeClusteringComponent : GH_Component
     {
         public TrainAgglomerativeClusteringComponent()
-          : base("层次聚类参数 Agglomerative", "层次聚类",
-              "训练层次聚类",
+          : base(L.Name("TrainAgglomerativeClusteringComponent"), L.Nick("TrainAgglomerativeClusteringComponent"), L.Desc("TrainAgglomerativeClusteringComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
@@ -90,7 +90,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

@@ -7,6 +7,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataInput
 {
     /// <summary>
@@ -16,8 +17,7 @@ namespace SimpleML.Components.DataInput
     public class WriteExcelComponent : GH_Component
     {
         public WriteExcelComponent()
-          : base("写入Excel Write Excel", "写入Excel",
-              "将数据写入Excel文件",
+          : base(L.Name("WriteExcelComponent"), L.Nick("WriteExcelComponent"), L.Desc("WriteExcelComponent"),
               "SimpleML", "01 Input")
         {
         }
@@ -74,7 +74,7 @@ namespace SimpleML.Components.DataInput
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -247,7 +247,7 @@ Calculate Statistics → (格式化) → Write Excel
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

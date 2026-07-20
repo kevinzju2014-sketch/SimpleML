@@ -8,6 +8,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DatasetManagement
 {
     /// <summary>
@@ -16,8 +17,7 @@ namespace SimpleML.Components.DatasetManagement
     public class QuickCreateDatasetComponent : GH_Component
     {
         public QuickCreateDatasetComponent()
-          : base("快速创建数据集 Quick Dataset", "快速数据集",
-              "简洁模式：只需 X 与可选 y，适合新手。高级预处理请用「创建数据集」。",
+          : base(L.Name("QuickCreateDatasetComponent"), L.Nick("QuickCreateDatasetComponent"), L.Desc("QuickCreateDatasetComponent"),
               "SimpleML", "03 Dataset")
         {
         }

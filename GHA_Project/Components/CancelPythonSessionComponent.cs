@@ -2,6 +2,7 @@ using System;
 using Grasshopper.Kernel;
 using SimpleML.Core;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.About
 {
     /// <summary>
@@ -10,8 +11,7 @@ namespace SimpleML.Components.About
     public class CancelPythonSessionComponent : GH_Component
     {
         public CancelPythonSessionComponent()
-          : base("重置Python会话 Reset Python", "重置会话",
-              "终止并重置 SimpleML 常驻 Python 进程。训练卡住或超时后可使用。",
+          : base(L.Name("CancelPythonSessionComponent"), L.Nick("CancelPythonSessionComponent"), L.Desc("CancelPythonSessionComponent"),
               "SimpleML", "09 Help")
         {
         }

@@ -8,13 +8,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DatasetManagement
 {
     public class DeconstructDatasetComponent : GH_Component
     {
         public DeconstructDatasetComponent()
-          : base("解构数据集 Deconstruct Dataset", "解构数据集",
-              "解构数据集对象，提取X和y",
+          : base(L.Name("DeconstructDatasetComponent"), L.Nick("DeconstructDatasetComponent"), L.Desc("DeconstructDatasetComponent"),
               "SimpleML", "03 Dataset")
         {
         }
@@ -44,7 +44,7 @@ namespace SimpleML.Components.DatasetManagement
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -349,7 +349,7 @@ Create Dataset (Data, Labels) → Deconstruct Dataset → (Data输出, Labels输
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

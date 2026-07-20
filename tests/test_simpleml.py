@@ -9,6 +9,11 @@ SimpleML 核心自动化测试（不依赖 Rhino / Grasshopper）
 
 from __future__ import annotations
 
+def _has_any(text, *needles):
+    s = text or ""
+    return any(n in s for n in needles)
+
+
 import os
 import sys
 import unittest
@@ -29,7 +34,7 @@ class TestEnvAndHealth(unittest.TestCase):
 
         result = run_health_check(ROOT, auto_fix=False)
         self.assertEqual(result["status"], "PASS", result.get("report"))
-        self.assertIn("下一步", result["next_steps"])
+        self.assertTrue(_has_any(result["next_steps"], "下一步", "Next"))
         self.assertTrue(os.path.isdir(result["project_dir"]))
 
 
@@ -43,7 +48,7 @@ class TestClassificationPipeline(unittest.TestCase):
         from core.model_bundle import SimpleMLModel
 
         X, y, feature_names, _, info = load_sklearn_dataset("iris", return_X_y=True)
-        self.assertIn("鸢尾", info)
+        self.assertTrue(_has_any(info, "鸢尾", "Iris", "iris"))
 
         ds = create_dataset(X, y, X_names=list(feature_names))
         train_ds, test_ds = split_dataset(ds, test_size=0.2, random_state=42)
@@ -53,9 +58,9 @@ class TestClassificationPipeline(unittest.TestCase):
         )
         self.assertIsInstance(model, SimpleMLModel)
         self.assertEqual(model.model_type, "classification")
-        self.assertIn("下一步", steps)
-        self.assertIn("模型卡片", card)
-        self.assertIn("算法", explanation)
+        self.assertTrue(_has_any(steps, "下一步", "Next steps"))
+        self.assertTrue(_has_any(card, "模型卡片", "Model card"))
+        self.assertTrue(_has_any(explanation, "算法", "Algorithm", "logistic", "random_forest", "classifier"))
 
         preds, proba, _, task = predict_auto(model, dataset=test_ds)
         self.assertEqual(task, "classification")
@@ -63,18 +68,18 @@ class TestClassificationPipeline(unittest.TestCase):
 
         metrics_json, report, verdict, _, cm = evaluate_auto(model, dataset=test_ds)
         self.assertIn("accuracy", metrics_json)
-        self.assertIn("结论", verdict)
-        self.assertIn("结论", report)
+        self.assertTrue(_has_any(verdict, "结论", "Verdict"))
+        self.assertTrue(_has_any(report, "结论", "Verdict"))
 
         fi_json, fi_exp, _ = calculate_feature_importance(model, list(feature_names))
         self.assertTrue(
             "petal" in fi_json.lower() or "sepal" in fi_json.lower(),
             f"feature importance should mention iris features, got: {fi_json[:200]}",
         )
-        self.assertIn("特征重要性", fi_exp)
+        self.assertTrue(_has_any(fi_exp, "特征重要性", "Feature importance", "Top features", "Top 特征"))
 
         self.assertIn("classification", next_steps_for_model(model))
-        self.assertIn("模型卡片", model_card(model))
+        self.assertTrue(_has_any(model_card(model), "模型卡片", "Model card"))
 
 
 class TestRegressionPipeline(unittest.TestCase):
@@ -96,7 +101,7 @@ class TestRegressionPipeline(unittest.TestCase):
         self.assertEqual(len(preds), test_ds.n_samples)
 
         _, report, verdict, _, _ = evaluate_auto(model, dataset=test_ds)
-        self.assertIn("结论", verdict)
+        self.assertTrue(_has_any(verdict, "结论", "Verdict"))
         self.assertTrue("R" in verdict or "R²" in verdict or "R2" in verdict or "r2" in report.lower() or "结论" in verdict)
 
 
@@ -118,11 +123,11 @@ class TestClusteringPipeline(unittest.TestCase):
         self.assertEqual(len(labels), ds.n_samples)
 
         _, _, verdict, _, _ = evaluate_auto(model, dataset=ds)
-        self.assertIn("结论", verdict)
+        self.assertTrue(_has_any(verdict, "结论", "Verdict"))
 
         score, explanation, _ = calculate_silhouette(dataset=ds, model=model)
         self.assertGreater(score, 0.2)
-        self.assertIn("轮廓", explanation)
+        self.assertTrue(_has_any(explanation, "轮廓", "Silhouette"))
 
 
 class TestPreprocessorBundle(unittest.TestCase):
@@ -159,7 +164,7 @@ class TestWizardAndDocsPresence(unittest.TestCase):
 
         for task in ("classification", "regression", "clustering"):
             text = wizard_recipe(task)
-            self.assertIn("配方", text)
+            self.assertTrue(_has_any(text, "配方", "Recipe"))
             self.assertGreater(len(text), 40)
 
     def test_docs_exist(self):

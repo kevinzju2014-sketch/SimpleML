@@ -6,13 +6,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelEvaluation
 {
     public class FeatureImportanceComponent : GH_Component
     {
         public FeatureImportanceComponent()
-          : base("特征重要性 Feature Importance", "特征重要性",
-              "解释模型中各特征的相对贡献（feature_importances_ 或 |coef_|）",
+          : base(L.Name("FeatureImportanceComponent"), L.Nick("FeatureImportanceComponent"), L.Desc("FeatureImportanceComponent"),
               "SimpleML", "07 Evaluation")
         {
         }

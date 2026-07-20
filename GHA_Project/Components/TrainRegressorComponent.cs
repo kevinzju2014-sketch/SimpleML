@@ -8,13 +8,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainRegressorComponent : GH_Component
     {
         public TrainRegressorComponent()
-          : base("训练回归器 Train Regressor", "训练回归器",
-              "训练回归器（通用）",
+          : base(L.Name("TrainRegressorComponent"), L.Nick("TrainRegressorComponent"), L.Desc("TrainRegressorComponent"),
               "SimpleML", "04 Model")
         {
         }
@@ -43,7 +43,7 @@ namespace SimpleML.Components.ModelTraining
 
             if (!DA.GetData(0, ref datasetObj))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "必须提供Dataset对象");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.need_dataset"));
                 return;
             }
             DA.GetData(1, ref algorithm);
@@ -56,7 +56,7 @@ namespace SimpleML.Components.ModelTraining
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -277,7 +277,7 @@ Create Dataset → Split Dataset
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

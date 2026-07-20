@@ -23,6 +23,7 @@ except Exception:
     pass
 
 import numpy as np
+from components.i18n import is_zh, t
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report,
@@ -185,7 +186,10 @@ def evaluate_classification(model, X=None, y_true=None, y_pred=None, metrics='al
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "分类模型评估完成（含通俗解读与结论）"
+    readme = t(
+        "Classification evaluation finished (plain-language notes + verdict)",
+        "分类模型评估完成（含通俗解读与结论）",
+    )
     
     return metrics_json, report, confusion_matrix_tree, readme
 
@@ -338,7 +342,10 @@ R² 分数: {metrics_dict.get('r2_score', 'N/A'):.4f}
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "回归模型评估完成（含通俗解读与结论）"
+    readme = t(
+        "Regression evaluation finished (plain-language notes + verdict)",
+        "回归模型评估完成（含通俗解读与结论）",
+    )
     
     return metrics_json, report, readme
 
@@ -453,6 +460,9 @@ Calinski-Harabasz指数: {metrics_dict.get('calinski_harabasz_score', 'N/A')}
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "聚类模型评估完成（含通俗解读、结论与ARI/NMI）"
+    readme = t(
+        "Clustering evaluation finished (plain-language notes, verdict, ARI/NMI)",
+        "聚类模型评估完成（含通俗解读、结论与ARI/NMI）",
+    )
     
     return metrics_json, report, readme

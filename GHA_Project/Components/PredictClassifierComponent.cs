@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelPrediction
 {
     public class PredictClassifierComponent : GH_Component
     {
         public PredictClassifierComponent()
-          : base("预测分类 Predict Classifier", "预测分类",
-              "使用训练好的分类模型进行预测",
+          : base(L.Name("PredictClassifierComponent"), L.Nick("PredictClassifierComponent"), L.Desc("PredictClassifierComponent"),
               "SimpleML", "06 Prediction")
         {
         }
@@ -51,7 +51,7 @@ namespace SimpleML.Components.ModelPrediction
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -258,7 +258,7 @@ Split Dataset (Test Dataset) → Deconstruct Dataset → Labels → Evaluate Cla
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

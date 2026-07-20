@@ -9,6 +9,11 @@ This mirrors Grasshopper component call paths without requiring Rhino GUI.
 
 from __future__ import annotations
 
+def _has_any(text, *needles):
+    s = text or ""
+    return any(n in s for n in needles)
+
+
 import json
 import os
 import sys
@@ -69,7 +74,7 @@ class TestHealth(unittest.TestCase):
 
         result = run_health_check(str(INSTALL), auto_fix=False)
         self.assertEqual(result["status"], "PASS", result.get("report"))
-        self.assertIn("下一步", result["next_steps"])
+        self.assertTrue(_has_any(result["next_steps"], "下一步", "Next"))
         self.assertTrue(result["project_dir"])
 
 
@@ -135,7 +140,7 @@ class TestClassificationFull(unittest.TestCase):
             self.train, task="classification"
         )
         self.assertEqual(len((model, info, expl, readme, steps, card)), 6)
-        self.assertIn("结论", evaluate_auto(model, dataset=self.test)[2] or "")
+        self.assertTrue(_has_any(evaluate_auto(model, dataset=self.test)[2] or "", "结论", "Verdict"))
 
         preds, proba, _, task = predict_auto(model, dataset=self.test)
         self.assertEqual(task, "classification")
@@ -152,9 +157,9 @@ class TestClassificationFull(unittest.TestCase):
 
         fi, fi_exp, _ = calculate_feature_importance(model, self.fn)
         self.assertTrue("petal" in fi.lower() or "sepal" in fi.lower() or "feature" in fi.lower())
-        self.assertIn("特征", fi_exp)
+        self.assertTrue(_has_any(fi_exp, "特征", "Feature", "Top"))
 
-        self.assertIn("模型", model_card(model))
+        self.assertTrue(_has_any(model_card(model), "模型", "Model"))
 
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "iris_model.pkl")
@@ -184,7 +189,7 @@ class TestRegressionFull(unittest.TestCase):
         self.assertEqual(len(preds), test.n_samples)
         metrics, report, verdict, _, _ = evaluate_auto(model, dataset=test)
         self.assertTrue("r2" in metrics.lower() or "mse" in metrics.lower())
-        self.assertIn("结论", verdict)
+        self.assertTrue(_has_any(verdict, "结论", "Verdict"))
 
         params, _ = train_ridge_regression()
         m2, _, _ = train_regressor(train, params)
@@ -212,7 +217,7 @@ class TestClusteringFull(unittest.TestCase):
         self.assertEqual(task, "clustering")
         self.assertEqual(len(labels), ds.n_samples)
         metrics, report, verdict, _, _ = evaluate_auto(model, dataset=ds)
-        self.assertIn("结论", verdict)
+        self.assertTrue(_has_any(verdict, "结论", "Verdict"))
 
         score, exp, _ = calculate_silhouette(dataset=ds, model=model)
         self.assertGreater(float(score), 0.2)
@@ -273,7 +278,7 @@ class TestFileIOAndWizard(unittest.TestCase):
         for task in ("classification", "regression", "clustering"):
             text = wizard_recipe(task)
             self.assertTrue(
-                "配方" in text or "环境体检" in text or "智能训练" in text,
+                _has_any(text, "配方", "Recipe", "环境体检", "Health Check", "智能训练", "Smart Train"),
                 f"wizard recipe too short/empty for {task}: {text[:120]}",
             )
 

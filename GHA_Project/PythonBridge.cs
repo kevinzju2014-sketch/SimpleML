@@ -34,6 +34,10 @@ namespace SimpleML.Core
             sb.AppendLine("    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')");
             sb.AppendLine($"sys.path.insert(0, r'{escaped}')");
             sb.AppendLine("os.environ['SIMPLEML_PATH'] = r'" + escaped + "'");
+            // Keep Python verdicts / explanations in sync with UI language.
+            string lang = "en";
+            try { lang = SimpleML.Localization.UiLanguage.Current; } catch { }
+            sb.AppendLine("os.environ['SIMPLEML_LANG'] = r'" + lang.Replace("'", "") + "'");
             sb.AppendLine("try:");
             sb.AppendLine("    from core.env_bootstrap import bootstrap_python_paths");
             sb.AppendLine($"    bootstrap_python_paths(r'{escaped}')");

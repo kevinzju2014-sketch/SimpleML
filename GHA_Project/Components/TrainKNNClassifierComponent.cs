@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainKNNClassifierComponent : GH_Component
     {
         public TrainKNNClassifierComponent()
-          : base("K近邻分类参数 KNN Classifier", "KNN分类",
-              "训练KNN分类器",
+          : base(L.Name("TrainKNNClassifierComponent"), L.Nick("TrainKNNClassifierComponent"), L.Desc("TrainKNNClassifierComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
@@ -94,7 +94,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

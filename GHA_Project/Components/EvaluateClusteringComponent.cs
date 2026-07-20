@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelEvaluation
 {
     public class EvaluateClusteringComponent : GH_Component
     {
         public EvaluateClusteringComponent()
-          : base("评估聚类 Evaluate Clustering", "评估聚类",
-              "评估聚类模型",
+          : base(L.Name("EvaluateClusteringComponent"), L.Nick("EvaluateClusteringComponent"), L.Desc("EvaluateClusteringComponent"),
               "SimpleML", "07 Evaluation")
         {
         }
@@ -42,7 +42,7 @@ namespace SimpleML.Components.ModelEvaluation
             if (!DA.GetData(0, ref modelObj)) return;
             if (!DA.GetData(1, ref datasetObj))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "必须提供Test Dataset输入");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.need_test_dataset"));
                 return;
             }
 
@@ -52,7 +52,7 @@ namespace SimpleML.Components.ModelEvaluation
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -312,7 +312,7 @@ Train Cluster (Model B) → Evaluate Clustering → Metrics B
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

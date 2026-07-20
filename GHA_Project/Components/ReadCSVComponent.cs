@@ -7,6 +7,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataInput
 {
     /// <summary>
@@ -16,8 +17,7 @@ namespace SimpleML.Components.DataInput
     public class ReadCSVComponent : GH_Component
     {
         public ReadCSVComponent()
-          : base("读取CSV Read CSV", "读取CSV",
-              "读取CSV文件并返回数据、列名和形状",
+          : base(L.Name("ReadCSVComponent"), L.Nick("ReadCSVComponent"), L.Desc("ReadCSVComponent"),
               "SimpleML", "01 Input")
         {
         }
@@ -68,7 +68,7 @@ namespace SimpleML.Components.DataInput
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量或确保myML在默认位置。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -258,7 +258,7 @@ Read CSV → Calculate Statistics / Calculate Correlation
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误详情: {ex}");
             }
         }

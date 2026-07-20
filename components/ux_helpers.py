@@ -17,6 +17,7 @@ from components.explain_components import (
     verdict_regression,
     verdict_clustering,
 )
+from components.i18n import is_zh, t
 
 
 def next_steps_for_model(model) -> str:
@@ -25,47 +26,73 @@ def next_steps_for_model(model) -> str:
     if isinstance(model, SimpleMLModel):
         task = model.model_type or task
         algo = model.algorithm or algo
-    mapping = {
-        "classification": (
-            "下一步:\n"
-            "1) 用「预测 Predict」或「预测分类」接 Model + 测试 Dataset/X\n"
-            "2) 用「评估 Evaluate」或「评估分类」接 Model + 测试 Dataset\n"
-            "3) 可选：「特征重要性」「可视化分类标签」"
-        ),
-        "regression": (
-            "下一步:\n"
-            "1) 用「预测」或「预测回归」\n"
-            "2) 用「评估」或「评估回归」\n"
-            "3) 可选：「可视化回归」"
-        ),
-        "clustering": (
-            "下一步:\n"
-            "1) 用「预测」或「预测聚类」\n"
-            "2) 用「评估」或「评估聚类」/「轮廓系数」\n"
-            "3) 可选：「可视化聚类标签」或「一键聚类上色」"
-        ),
-    }
-    header = f"模型类型: {task} | 算法: {algo}\n"
+    if is_zh():
+        mapping = {
+            "classification": (
+                "下一步:\n"
+                "1) 用「预测」或「预测分类」接 Model + 测试 Dataset/X\n"
+                "2) 用「评估」或「评估分类」接 Model + 测试 Dataset\n"
+                "3) 可选：「特征重要性」「可视化分类标签」"
+            ),
+            "regression": (
+                "下一步:\n"
+                "1) 用「预测」或「预测回归」\n"
+                "2) 用「评估」或「评估回归」\n"
+                "3) 可选：「可视化回归」"
+            ),
+            "clustering": (
+                "下一步:\n"
+                "1) 用「预测」或「预测聚类」\n"
+                "2) 用「评估」或「评估聚类」/「轮廓系数」\n"
+                "3) 可选：「可视化聚类标签」或「一键聚类上色」"
+            ),
+        }
+        header = f"模型类型: {task} | 算法: {algo}\n"
+    else:
+        mapping = {
+            "classification": (
+                "Next steps:\n"
+                "1) Use Predict or Predict Classifier with Model + test Dataset/X\n"
+                "2) Use Evaluate or Evaluate Classification with Model + test Dataset\n"
+                "3) Optional: Feature Importance / Visualize Classification"
+            ),
+            "regression": (
+                "Next steps:\n"
+                "1) Use Predict or Predict Regressor\n"
+                "2) Use Evaluate or Evaluate Regression\n"
+                "3) Optional: Visualize Regression"
+            ),
+            "clustering": (
+                "Next steps:\n"
+                "1) Use Predict or Predict Cluster\n"
+                "2) Use Evaluate / Evaluate Clustering / Silhouette Score\n"
+                "3) Optional: Visualize Clustering or Quick Cluster Color"
+            ),
+        }
+        header = f"Model type: {task} | Algorithm: {algo}\n"
     return header + mapping.get(task, mapping["classification"])
 
 
 def model_card(model) -> str:
-    lines = ["模型卡片", "=" * 32]
+    lines = [t("Model card", "模型卡片"), "=" * 32]
     if isinstance(model, SimpleMLModel):
-        lines.append(f"任务: {model.model_type}")
-        lines.append(f"算法: {model.algorithm}")
-        lines.append(f"预处理打包: {'是' if model.preprocessor is not None else '否'}")
+        lines.append(t(f"Task: {model.model_type}", f"任务: {model.model_type}"))
+        lines.append(t(f"Algorithm: {model.algorithm}", f"算法: {model.algorithm}"))
+        packed = "yes" if model.preprocessor is not None else "no"
+        packed_zh = "是" if model.preprocessor is not None else "否"
+        lines.append(t(f"Preprocessor packed: {packed}", f"预处理打包: {packed_zh}"))
         if model.feature_names:
-            lines.append(f"特征名: {', '.join(map(str, model.feature_names[:12]))}")
+            names = ", ".join(map(str, model.feature_names[:12]))
+            lines.append(t(f"Features: {names}", f"特征名: {names}"))
         nfi = getattr(model, "n_features_in_", None) or getattr(model.model, "n_features_in_", None)
         if nfi is not None:
-            lines.append(f"特征数: {nfi}")
-        lines.append(f"底层: {type(unwrap_model(model)).__name__}")
+            lines.append(t(f"Feature count: {nfi}", f"特征数: {nfi}"))
+        lines.append(t(f"Estimator: {type(unwrap_model(model)).__name__}", f"底层: {type(unwrap_model(model)).__name__}"))
     else:
-        lines.append(f"任务: 未知（裸模型）")
-        lines.append(f"底层: {type(model).__name__}")
+        lines.append(t("Task: unknown (raw model)", "任务: 未知（裸模型）"))
+        lines.append(t(f"Estimator: {type(model).__name__}", f"底层: {type(model).__name__}"))
         if hasattr(model, "n_features_in_"):
-            lines.append(f"特征数: {model.n_features_in_}")
+            lines.append(t(f"Feature count: {model.n_features_in_}", f"特征数: {model.n_features_in_}"))
     return "\n".join(lines)
 
 
@@ -151,7 +178,37 @@ def evaluate_auto(model, dataset=None, X=None, y_true=None) -> Tuple[str, str, s
     return metrics_json, report, verdict, readme, cm
 
 
-WIZARD_RECIPES = {
+WIZARD_RECIPES_EN = {
+    "classification": """[Recipe] Iris classification (~5 min)
+1. Health Check → Run=true → confirm PASS
+2. Load Dataset → DN=iris → use Dataset output
+3. Split Dataset → Train / Test
+4. Smart Train → Dataset=Train, Task=classification
+5. Predict → Model + Test Dataset
+6. Evaluate → Model + Test Dataset → read Verdict
+7. (Optional) Feature Importance
+
+Search: Health Check / Load Dataset / Split Dataset / Smart Train / Predict / Evaluate
+""",
+    "clustering": """[Recipe] Clustering + color
+1. Health Check PASS
+2. Load Dataset → make_blobs (or your own points)
+3. Smart Train → Task=clustering, K=3
+4. Quick Cluster Color → Points + Model (or Labels)
+   or: Predict Cluster → Visualize Clustering
+5. Silhouette Score / Evaluate → read Verdict
+""",
+    "regression": """[Recipe] Regression
+1. Health Check PASS
+2. Load Dataset → diabetes
+3. Split Dataset
+4. Smart Train → Task=regression
+5. Predict + Evaluate → read R² Verdict
+6. (Optional) Visualize Regression
+""",
+}
+
+WIZARD_RECIPES_ZH = {
     "classification": """【配方】鸢尾花分类（约 5 分钟）
 1. 环境体检 → Run=true → 确认 PASS
 2. 加载示例数据集 → DN=iris → 接「Dataset」输出
@@ -181,6 +238,9 @@ WIZARD_RECIPES = {
 """,
 }
 
+# Backward-compatible alias
+WIZARD_RECIPES = WIZARD_RECIPES_ZH
+
 
 def wizard_recipe(task: str = "classification") -> str:
     key = (task or "classification").strip().lower()
@@ -190,4 +250,5 @@ def wizard_recipe(task: str = "classification") -> str:
         key = "regression"
     if key in ("cluster", "clust", "聚类"):
         key = "clustering"
-    return WIZARD_RECIPES.get(key, WIZARD_RECIPES["classification"])
+    table = WIZARD_RECIPES_ZH if is_zh() else WIZARD_RECIPES_EN
+    return table.get(key, table["classification"])

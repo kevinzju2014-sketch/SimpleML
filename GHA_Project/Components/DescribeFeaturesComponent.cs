@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataAnalysis
 {
     public class DescribeFeaturesComponent : GH_Component
     {
         public DescribeFeaturesComponent()
-          : base("描述特征 Describe Features", "描述特征",
-              "描述特征（count, mean, std, min, 25%%, 50%%, 75%%, max）",
+          : base(L.Name("DescribeFeaturesComponent"), L.Nick("DescribeFeaturesComponent"), L.Desc("DescribeFeaturesComponent"),
               "SimpleML", "02 Analysis")
         {
         }
@@ -44,7 +44,7 @@ namespace SimpleML.Components.DataAnalysis
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -262,7 +262,7 @@ Load Dataset → Describe Features → (了解特征分布) → Create Dataset
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

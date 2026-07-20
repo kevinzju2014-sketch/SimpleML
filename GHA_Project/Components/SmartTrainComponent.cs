@@ -6,13 +6,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class SmartTrainComponent : GH_Component
     {
         public SmartTrainComponent()
-          : base("智能训练 Smart Train", "智能训练",
-              "一键训练：Dataset → Model。自动识别任务并给出下一步与模型卡片。",
+          : base(L.Name("SmartTrainComponent"), L.Nick("SmartTrainComponent"), L.Desc("SmartTrainComponent"),
               "SimpleML", "04 Model")
         {
         }

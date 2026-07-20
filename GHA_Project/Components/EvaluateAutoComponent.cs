@@ -4,6 +4,7 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelEvaluation
 {
     /// <summary>
@@ -12,8 +13,7 @@ namespace SimpleML.Components.ModelEvaluation
     public class EvaluateAutoComponent : GH_Component
     {
         public EvaluateAutoComponent()
-          : base("评估 Evaluate", "评估",
-              "统一评估：自动识别分类/回归/聚类，输出结论句 Verdict",
+          : base(L.Name("EvaluateAutoComponent"), L.Nick("EvaluateAutoComponent"), L.Desc("EvaluateAutoComponent"),
               "SimpleML", "07 Evaluation")
         {
         }

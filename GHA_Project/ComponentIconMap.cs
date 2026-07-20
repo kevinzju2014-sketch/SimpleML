@@ -78,6 +78,7 @@ namespace SimpleML.Core
             
             // 帮助
             { "AboutComponent", "about.png" },
+            { "LanguageSwitchComponent", "language.png" },
             { "InstallationGuideComponent", "installation_guide.png" },
             { "HealthCheckComponent", "health_check.png" },
             { "PredictAutoComponent", "predict_auto.png" },

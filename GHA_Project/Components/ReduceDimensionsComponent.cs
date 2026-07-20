@@ -9,6 +9,7 @@ using Rhino.Display;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.Visualization
 {
     /// <summary>
@@ -22,8 +23,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public ReduceDimensionsComponent()
-          : base("降维 Reduce Dimensions", "降维",
-              "将高维数据降维到2D/3D并可视化",
+          : base(L.Name("ReduceDimensionsComponent"), L.Nick("ReduceDimensionsComponent"), L.Desc("ReduceDimensionsComponent"),
               "SimpleML", "08 Visualization")
         {
         }
@@ -79,7 +79,7 @@ namespace SimpleML.Components.Visualization
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -219,7 +219,7 @@ namespace SimpleML.Components.Visualization
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

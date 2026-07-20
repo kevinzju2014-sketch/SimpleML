@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelManagement
 {
     public class LoadModelComponent : GH_Component
     {
         public LoadModelComponent()
-          : base("加载模型 Load Model", "加载模型",
-              "加载模型",
+          : base(L.Name("LoadModelComponent"), L.Nick("LoadModelComponent"), L.Desc("LoadModelComponent"),
               "SimpleML", "04 Model")
         {
         }
@@ -73,7 +73,7 @@ namespace SimpleML.Components.ModelManagement
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -253,7 +253,7 @@ Load Model (model_v2.pkl) → Predict → (使用v2模型)
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainRandomForestRegressorComponent : GH_Component
     {
         public TrainRandomForestRegressorComponent()
-          : base("随机森林回归参数 Random Forest Regressor", "随机森林回归",
-              "训练随机森林回归器",
+          : base(L.Name("TrainRandomForestRegressorComponent"), L.Nick("TrainRandomForestRegressorComponent"), L.Desc("TrainRandomForestRegressorComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
@@ -106,7 +106,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

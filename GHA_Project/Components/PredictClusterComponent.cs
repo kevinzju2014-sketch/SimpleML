@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelPrediction
 {
     public class PredictClusterComponent : GH_Component
     {
         public PredictClusterComponent()
-          : base("预测聚类 Predict Cluster", "预测聚类",
-              "使用训练好的聚类模型进行预测（分配聚类标签）",
+          : base(L.Name("PredictClusterComponent"), L.Nick("PredictClusterComponent"), L.Desc("PredictClusterComponent"),
               "SimpleML", "06 Prediction")
         {
         }
@@ -50,7 +50,7 @@ namespace SimpleML.Components.ModelPrediction
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -228,7 +228,7 @@ Create Dataset → Evaluate Clustering
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

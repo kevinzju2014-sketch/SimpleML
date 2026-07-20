@@ -4,13 +4,13 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelEvaluation
 {
     public class SilhouetteScoreComponent : GH_Component
     {
         public SilhouetteScoreComponent()
-          : base("轮廓系数 Silhouette Score", "轮廓系数",
-              "计算聚类轮廓系数，评价簇的紧凑度与分离度",
+          : base(L.Name("SilhouetteScoreComponent"), L.Nick("SilhouetteScoreComponent"), L.Desc("SilhouetteScoreComponent"),
               "SimpleML", "07 Evaluation")
         {
         }

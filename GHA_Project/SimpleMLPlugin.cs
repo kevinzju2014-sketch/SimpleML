@@ -1,18 +1,19 @@
 using System;
 using System.Reflection;
 using Grasshopper.Kernel;
+using SimpleML.Localization;
 
 namespace SimpleML
 {
     /// <summary>
     /// SimpleML Plugin Info
-    /// Grasshopper会自动发现所有继承自GH_Component的类
+    /// Grasshopper discovers all GH_Component subclasses automatically.
     /// </summary>
     public class SimpleMLPlugin : GH_AssemblyInfo
     {
         public override string Name => "SimpleML";
-        public override string Description => "基于scikit-learn的Grasshopper机器学习插件（Rhino 7+ / Windows / macOS）";
-        public override string AuthorName => "参数化凯通学";
+        public override string Description => L.T("plugin.desc");
+        public override string AuthorName => "参数化凯通学 / Parametric Kai";
         public override string AuthorContact => "zhao_guijia@outlook.com";
         // 正式插件 GUID（请勿再使用占位符）
         public override Guid Id => new Guid("8F3C2A91-6B47-4E1D-9C55-2D8A0E7B4F16");

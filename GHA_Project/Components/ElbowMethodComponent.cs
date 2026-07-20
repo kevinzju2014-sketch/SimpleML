@@ -6,6 +6,7 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.Visualization
 {
     /// <summary>
@@ -15,8 +16,7 @@ namespace SimpleML.Components.Visualization
     public class ElbowMethodComponent : GH_Component
     {
         public ElbowMethodComponent()
-          : base("肘部法则 Elbow Method", "肘部法则",
-              "使用Elbow方法确定最佳聚类数",
+          : base(L.Name("ElbowMethodComponent"), L.Nick("ElbowMethodComponent"), L.Desc("ElbowMethodComponent"),
               "SimpleML", "08 Visualization")
         {
         }
@@ -60,7 +60,7 @@ namespace SimpleML.Components.Visualization
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -149,7 +149,7 @@ namespace SimpleML.Components.Visualization
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

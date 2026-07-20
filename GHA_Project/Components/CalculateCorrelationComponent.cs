@@ -7,13 +7,13 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DataAnalysis
 {
     public class CalculateCorrelationComponent : GH_Component
     {
         public CalculateCorrelationComponent()
-          : base("计算相关性 Calculate Correlation", "计算相关性",
-              "计算数据的相关性矩阵",
+          : base(L.Name("CalculateCorrelationComponent"), L.Nick("CalculateCorrelationComponent"), L.Desc("CalculateCorrelationComponent"),
               "SimpleML", "02 Analysis")
         {
         }
@@ -45,7 +45,7 @@ namespace SimpleML.Components.DataAnalysis
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -153,7 +153,7 @@ print('OUTPUT_2:计算特征之间的相关性矩阵')
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }
