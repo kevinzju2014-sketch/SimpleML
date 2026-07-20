@@ -7,18 +7,18 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelPrediction
 {
     public class PredictClassifierComponent : GH_Component
     {
         public PredictClassifierComponent()
-          : base("Predict Classifier", "PredictClf",
-              "使用训练好的分类模型进行预测",
+          : base(L.Name("PredictClassifierComponent"), L.Nick("PredictClassifierComponent"), L.Desc("PredictClassifierComponent"),
               "SimpleML", "06 Prediction")
         {
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
@@ -51,7 +51,7 @@ namespace SimpleML.Components.ModelPrediction
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -84,7 +84,7 @@ namespace SimpleML.Components.ModelPrediction
                 pythonCodeBuilder.AppendLine("        if sp not in sys.path:");
                 pythonCodeBuilder.AppendLine("            sys.path.insert(0, sp)");
                 pythonCodeBuilder.AppendLine("    ");
-                pythonCodeBuilder.AppendLine("    rhino_site_envs = r'C:\\Users\\Administrator\\.rhinocode\\py39-rh8\\site-envs'");
+                pythonCodeBuilder.AppendLine("    rhino_site_envs = str(next((p for root in [__import__('pathlib').Path.home()/'.rhinocode', __import__('pathlib').Path.home()/'Library'/'Application Support'/'McNeel'/'Rhinoceros'/'.rhinocode'] if root.exists() for p in root.glob('py*-rh*/site-envs') if p.is_dir()), __import__('pathlib').Path.home()/'.rhinocode'/'site-envs'))");
                 pythonCodeBuilder.AppendLine("    if os.path.exists(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("        for item in os.listdir(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("            env_path = os.path.join(rhino_site_envs, item)");
@@ -258,7 +258,7 @@ Split Dataset (Test Dataset) → Deconstruct Dataset → Labels → Evaluate Cla
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }
@@ -318,23 +318,7 @@ Split Dataset (Test Dataset) → Deconstruct Dataset → Labels → Evaluate Cla
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string ExtractValue(string output, string prefix)

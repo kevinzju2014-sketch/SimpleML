@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SimpleML Icons · 灰底选型 V1–V5</title>
+  <style>
+    :root {
+      --ink: #1e1e1e;
+      --muted: #5a5a5a;
+      --gh: #373737;
+      --gh2: #484848;
+      --line: #d0d0d0;
+      --accent: #2f6f4e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8e8e8;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 18px 110px; }
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    h1 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 650; margin: 6px 0 8px; }
+    .lead { max-width: 70ch; color: var(--muted); margin: 0 0 18px; }
+    .rule {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      font-size: 14px;
+    }
+    .rule strong { color: var(--accent); }
+    .board {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #222;
+      margin-bottom: 20px;
+      background: #282828;
+    }
+    .board img { display: block; width: 100%; height: auto; }
+    .grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    .card {
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47,111,78,.2);
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; padding: 14px 16px 8px;
+    }
+    .card-head h2 { margin: 0; font-size: 20px; }
+    .card-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .tag {
+      flex: none; font-size: 12px; font-weight: 700;
+      background: #eee; padding: 4px 10px; border-radius: 999px;
+    }
+    .grey-stage {
+      background: var(--gh);
+      padding: 14px 14px 10px;
+      border-top: 1px solid #222;
+      border-bottom: 1px solid #222;
+    }
+    .grey-stage .label {
+      color: #c8c8c8; font-size: 12px; margin-bottom: 8px; font-weight: 600;
+    }
+    .zoom {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
+    }
+    .zoom .cell {
+      width: 72px; text-align: center;
+    }
+    .zoom .well {
+      width: 72px; height: 72px;
+      background: #303030;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 0 0 1px #222;
+    }
+    .zoom img {
+      width: 48px; height: 48px;
+      image-rendering: pixelated;
+    }
+    .zoom .cap { color: #bdbdbd; font-size: 11px; margin-top: 4px; }
+    .real {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 8px 10px; background: var(--gh2); border-radius: 8px;
+    }
+    .real span { color: #bbb; font-size: 11px; margin-right: 4px; }
+    .real img {
+      width: 24px; height: 24px;
+      image-rendering: pixelated;
+    }
+    .actions { padding: 12px 16px 16px; }
+    .pick {
+      width: 100%; border: 0; border-radius: 10px;
+      padding: 12px; background: #222; color: #fff;
+      font-weight: 700; font-size: 15px; cursor: pointer;
+    }
+    .card.selected .pick { background: var(--accent); }
+    .footer {
+      position: sticky; bottom: 10px;
+      background: rgba(30,30,30,.95); color: #fff;
+      border-radius: 12px; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .hint { font-size: 13px; opacity: .85; }
+    .copy {
+      border: 1px solid rgba(255,255,255,.35); background: transparent;
+      color: #fff; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-weight: 650;
+    }
+    .compare {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+      margin: 12px 0 18px;
+    }
+    @media (max-width: 900px) { .compare { grid-template-columns: repeat(2, 1fr); } }
+    .compare button {
+      background: var(--gh); color: #eee; border: 2px solid transparent;
+      border-radius: 10px; padding: 10px 8px; cursor: pointer; text-align: center;
+    }
+    .compare button.active { border-color: #7dcea0; }
+    .compare img { width: 100%; height: auto; image-rendering: pixelated; margin-top: 6px; }
+    .compare .t { font-size: 12px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Grasshopper grey toolbar preview</div>
+    <h1>在灰色背景上选型（V1–V5）</h1>
+    <p class="lead">
+      原则：图标必须在 <strong>GH 灰工具栏</strong>上足够清晰，用户一眼能认。
+      下面每套都放在灰色底上；上面是放大看工艺，下面是真实 24×24。
+      <strong>确认前不改插件。</strong>
+    </p>
+
+    <div class="rule">
+      评判标准：在灰底上，<strong>Data / Train / Predict / Evaluate / Cluster</strong> 能否快速区分？
+      选一套后点「复制选择结果」发给我。
+    </div>
+
+    <div class="compare" id="jump">
+      <button type="button" data-jump="V1"><div class="t">V1 Vivid</div><img src="icon_choose/V1_24px.png" alt="" /></button>
+      <button type="button" data-jump="V2"><div class="t">V2 Soft</div><img src="icon_choose/V2_24px.png" alt="" /></button>
+      <button type="button" data-jump="V3"><div class="t">V3 High Contrast</div><img src="icon_choose/V3_24px.png" alt="" /></button>
+      <button type="button" data-jump="V4"><div class="t">V4 Task Hue</div><img src="icon_choose/V4_24px.png" alt="" /></button>
+      <button type="button" data-jump="V5"><div class="t">V5 Gray+Accent</div><img src="icon_choose/V5_24px.png" alt="" /></button>
+    </div>
+
+    <div class="board">
+      <img src="icon_choose_board.png" alt="All versions on grey" />
+    </div>
+
+    <div class="grid" id="cards">
+      <!-- cards filled by template below -->
+    </div>
+
+    <div class="footer">
+      <div>
+        <strong id="choice">尚未选择</strong>
+        <div class="hint" id="hint">先在灰底上比较真实 24px，再选 V1–V5。</div>
+      </div>
+      <button class="copy" type="button" id="copyBtn">复制选择结果</button>
+    </div>
+  </div>
+
+  <script>
+    const VERSIONS = {
+      V1: { title: "Official Vivid", note: "最像官方：鲜绿/蓝/橙，灰底对比最强。" },
+      V2: { title: "Official Soft", note: "同立体语言，饱和略降，更耐看。" },
+      V3: { title: "High Contrast on Grey", note: "专为灰工具栏：更亮高光 + 更深描边。" },
+      V4: { title: "Task Hue Objects", note: "黄分类 / 橙回归 / 绿聚类，色在物体上。" },
+      V5: { title: "Gray Body + Accent", note: "灰塑料主体 + 彩色点缀，家族统一。" }
+    };
+    const KEYS = ["data","train","predict","eval","cluster","split","line","smart"];
+    const LABELS = { data:"Data", train:"Train", predict:"Predict", eval:"Evaluate", cluster:"Cluster", split:"Split", line:"Regress", smart:"Smart" };
+    const msgs = {
+      V1: "我选择 V1（Official Vivid）。请按灰底清晰原则，用官方立体物件工艺重绘全套图标并编译安装。",
+      V2: "我选择 V2（Official Soft）。请按灰底清晰原则重绘全套图标并编译安装。",
+      V3: "我选择 V3（High Contrast on Grey）。请用更高对比的立体物件重绘全套图标并编译安装。",
+      V4: "我选择 V4（Task Hue Objects）。请在立体物件上用任务色重绘全套图标并编译安装。",
+      V5: "我选择 V5（Gray Body + Accent）。请用灰主体+彩点缀重绘全套图标并编译安装。"
+    };
+
+    const root = document.getElementById("cards");
+    Object.keys(VERSIONS).forEach(vid => {
+      const v = VERSIONS[vid];
+      const art = document.createElement("article");
+      art.className = "card";
+      art.id = "card-" + vid;
+      art.dataset.plan = vid;
+      art.innerHTML = `
+        <div class="card-head">
+          <div>
+            <h2>${vid} · ${v.title}</h2>
+            <p>${v.note}</p>
+          </div>
+          <span class="tag">${vid}</span>
+        </div>
+        <div class="grey-stage">
+          <div class="label">放大 ×2（灰底）— 看是否够清楚</div>
+          <div class="zoom">
+            ${KEYS.map(k => `
+              <div class="cell">
+                <div class="well"><img src="icon_choose/${vid}_${k}_on_grey.png" alt="" /></div>
+                <div class="cap">${LABELS[k]}</div>
+              </div>`).join("")}
+          </div>
+          <div class="real">
+            <span>真实 24×24：</span>
+            ${KEYS.map(k => `<img src="icon_choose/${vid}_${k}.png" alt="" />`).join("")}
+          </div>
+        </div>
+        <div class="actions">
+          <button class="pick" type="button" data-pick="${vid}">选择 ${vid}</button>
+        </div>`;
+      root.appendChild(art);
+    });
+
+    let selected = null;
+    function setChoice(plan) {
+      selected = plan;
+      document.querySelectorAll(".card").forEach(c => c.classList.toggle("selected", c.dataset.plan === plan));
+      document.querySelectorAll("#jump button").forEach(b => b.classList.toggle("active", b.dataset.jump === plan));
+      document.getElementById("choice").textContent = "已选择 " + plan;
+      document.getElementById("hint").textContent = msgs[plan];
+      try { localStorage.setItem("simpleml-icon-v", plan); } catch (e) {}
+    }
+    document.addEventListener("click", (e) => {
+      const pick = e.target.closest("[data-pick]");
+      if (pick) setChoice(pick.dataset.pick);
+      const jump = e.target.closest("[data-jump]");
+      if (jump) {
+        setChoice(jump.dataset.jump);
+        document.getElementById("card-" + jump.dataset.jump).scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      if (!selected) { alert("请先选择 V1–V5"); return; }
+      try {
+        await navigator.clipboard.writeText(msgs[selected]);
+        document.getElementById("copyBtn").textContent = "已复制";
+        setTimeout(() => document.getElementById("copyBtn").textContent = "复制选择结果", 1200);
+      } catch (e) { prompt("复制发给我：", msgs[selected]); }
+    });
+    try {
+      const s = localStorage.getItem("simpleml-icon-v");
+      if (s && msgs[s]) setChoice(s);
+    } catch (e) {}
+  </script>
+</body>
+</html>

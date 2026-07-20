@@ -24,8 +24,8 @@ try:
             sys.path.insert(0, sp)
     
     # 尝试添加Rhino Python的site-envs路径
-    # pandas安装在: C:\Users\Administrator\.rhinocode\py39-rh8\site-envs\default-sFQ4Ch2s\pandas
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
+    # pandas / openpyxl 由 env_bootstrap 注入的 site-packages 提供
+    rhino_site_envs = str(next((p for root in [__import__('pathlib').Path.home()/'.rhinocode', __import__('pathlib').Path.home()/'Library'/'Application Support'/'McNeel'/'Rhinoceros'/'.rhinocode'] if root.exists() for p in root.glob('py*-rh*/site-envs') if p.is_dir()), __import__('pathlib').Path.home()/'.rhinocode'/'site-envs'))
     if os.path.exists(rhino_site_envs):
         # 查找所有虚拟环境
         for item in os.listdir(rhino_site_envs):

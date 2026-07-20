@@ -15,32 +15,29 @@ if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
 # 确保Rhino Python的site-packages在路径中
+# 跨平台引导 Rhino / 系统 site-packages
 try:
-    site_packages = site.getsitepackages()
-    for sp in site_packages:
-        if sp not in sys.path:
-            sys.path.insert(0, sp)
-    
-    # 添加Rhino Python的site-envs虚拟环境路径
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
-    if os.path.exists(rhino_site_envs):
-        for item in os.listdir(rhino_site_envs):
-            env_path = os.path.join(rhino_site_envs, item)
-            if os.path.isdir(env_path):
-                if env_path not in sys.path:
-                    sys.path.insert(0, env_path)
-                site_pkg = os.path.join(env_path, 'Lib', 'site-packages')
-                if os.path.exists(site_pkg) and site_pkg not in sys.path:
-                    sys.path.insert(0, site_pkg)
+    from core.env_bootstrap import bootstrap_python_paths
+    bootstrap_python_paths(project_dir)
 except Exception:
     pass
 
 import numpy as np
+from components.i18n import is_zh, t
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report,
     mean_squared_error, mean_absolute_error, r2_score, explained_variance_score,
-    silhouette_score, davies_bouldin_score, calinski_harabasz_score
+    silhouette_score, davies_bouldin_score, calinski_harabasz_score,
+    adjusted_rand_score, normalized_mutual_info_score
+)
+from components.explain_components import (
+    explain_classification_metrics,
+    explain_regression_metrics,
+    explain_clustering_metrics,
+    verdict_classification,
+    verdict_regression,
+    verdict_clustering,
 )
 
 
@@ -170,14 +167,29 @@ def evaluate_classification(model, X=None, y_true=None, y_pred=None, metrics='al
 
 ===================================================================
 """
-        report = report_base + explanation
-    except:
-        report = f"分类报告生成失败\n准确率: {metrics_dict.get('accuracy', 'N/A')}"
+        report = (
+            report_base
+            + explanation
+            + "\n\n"
+            + explain_classification_metrics(metrics_dict)
+            + "\n\n"
+            + verdict_classification(metrics_dict)
+        )
+    except Exception:
+        report = (
+            f"分类报告生成失败\n准确率: {metrics_dict.get('accuracy', 'N/A')}\n\n"
+            + explain_classification_metrics(metrics_dict)
+            + "\n\n"
+            + verdict_classification(metrics_dict)
+        )
     
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "分类模型评估完成"
+    readme = t(
+        "Classification evaluation finished (plain-language notes + verdict)",
+        "分类模型评估完成（含通俗解读与结论）",
+    )
     
     return metrics_json, report, confusion_matrix_tree, readme
 
@@ -318,12 +330,22 @@ R² 分数: {metrics_dict.get('r2_score', 'N/A'):.4f}
 
 ===================================================================
 """
-    report = report_base + explanation
+    report = (
+        report_base
+        + explanation
+        + "\n\n"
+        + explain_regression_metrics(metrics_dict)
+        + "\n\n"
+        + verdict_regression(metrics_dict)
+    )
     
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "回归模型评估完成"
+    readme = t(
+        "Regression evaluation finished (plain-language notes + verdict)",
+        "回归模型评估完成（含通俗解读与结论）",
+    )
     
     return metrics_json, report, readme
 
@@ -346,6 +368,9 @@ def evaluate_clustering(model, X=None, y_true=None, y_pred=None, metrics='all'):
     """
     y_true = np.array(y_true).ravel() if y_true is not None else None
     
+    from core.model_bundle import unwrap_model
+    inner = unwrap_model(model)
+
     # 如果提供了y_pred，直接使用；否则使用X进行预测
     if y_pred is not None:
         labels = np.array(y_pred).ravel()
@@ -354,12 +379,15 @@ def evaluate_clustering(model, X=None, y_true=None, y_pred=None, metrics='all'):
         # 获取聚类标签
         if hasattr(model, 'predict'):
             labels = model.predict(X)
-        elif hasattr(model, 'labels_'):
-            labels = model.labels_
+        elif hasattr(inner, 'labels_'):
+            labels = inner.labels_
         else:
-            labels = model.fit_predict(X)
+            labels = model.fit_predict(X) if hasattr(model, 'fit_predict') else inner.fit_predict(X)
     else:
         raise ValueError("必须提供X或y_pred参数")
+
+    if X is not None:
+        X = np.array(X)
     
     # 确定要计算的指标
     if metrics == 'all' or metrics is None:
@@ -375,38 +403,44 @@ def evaluate_clustering(model, X=None, y_true=None, y_pred=None, metrics='all'):
     n_clusters = len(np.unique(labels[labels >= 0]))  # 排除噪声点（-1）
     metrics_dict['n_clusters'] = int(n_clusters)
     
-    if 'silhouette_score' in metrics_list or metrics == 'all':
+    if X is not None and ('silhouette_score' in metrics_list or metrics == 'all'):
         try:
             if n_clusters > 1:
                 metrics_dict['silhouette_score'] = float(silhouette_score(X, labels))
             else:
                 metrics_dict['silhouette_score'] = None
-        except:
+        except Exception:
             metrics_dict['silhouette_score'] = None
     
-    if 'davies_bouldin_score' in metrics_list or metrics == 'all':
+    if X is not None and ('davies_bouldin_score' in metrics_list or metrics == 'all'):
         try:
             if n_clusters > 1:
                 metrics_dict['davies_bouldin_score'] = float(davies_bouldin_score(X, labels))
             else:
                 metrics_dict['davies_bouldin_score'] = None
-        except:
+        except Exception:
             metrics_dict['davies_bouldin_score'] = None
     
-    if 'calinski_harabasz_score' in metrics_list or metrics == 'all':
+    if X is not None and ('calinski_harabasz_score' in metrics_list or metrics == 'all'):
         try:
             if n_clusters > 1:
                 metrics_dict['calinski_harabasz_score'] = float(calinski_harabasz_score(X, labels))
             else:
                 metrics_dict['calinski_harabasz_score'] = None
-        except:
+        except Exception:
             metrics_dict['calinski_harabasz_score'] = None
     
-    # 如果有真实标签，可以计算有监督指标
+    # 有真实标签时计算监督指标
     if y_true is not None:
         y_true = np.array(y_true).ravel()
-        # 可以添加有监督评估指标，如adjusted_rand_score等
-        pass
+        try:
+            metrics_dict['adjusted_rand_score'] = float(adjusted_rand_score(y_true, labels))
+        except Exception:
+            metrics_dict['adjusted_rand_score'] = None
+        try:
+            metrics_dict['normalized_mutual_info'] = float(normalized_mutual_info_score(y_true, labels))
+        except Exception:
+            metrics_dict['normalized_mutual_info'] = None
     
     # 生成详细报告
     report = f"""聚类模型评估报告
@@ -415,11 +449,20 @@ def evaluate_clustering(model, X=None, y_true=None, y_pred=None, metrics='all'):
 轮廓系数: {metrics_dict.get('silhouette_score', 'N/A')}
 Davies-Bouldin指数: {metrics_dict.get('davies_bouldin_score', 'N/A')}
 Calinski-Harabasz指数: {metrics_dict.get('calinski_harabasz_score', 'N/A')}
+调整兰德指数(ARI): {metrics_dict.get('adjusted_rand_score', 'N/A')}
+归一化互信息(NMI): {metrics_dict.get('normalized_mutual_info', 'N/A')}
+
+{explain_clustering_metrics(metrics_dict)}
+
+{verdict_clustering(metrics_dict)}
 """
     
     # 转换为JSON字符串
     metrics_json = json.dumps(metrics_dict, ensure_ascii=False, indent=2)
     
-    readme = "聚类模型评估完成"
+    readme = t(
+        "Clustering evaluation finished (plain-language notes, verdict, ARI/NMI)",
+        "聚类模型评估完成（含通俗解读、结论与ARI/NMI）",
+    )
     
     return metrics_json, report, readme

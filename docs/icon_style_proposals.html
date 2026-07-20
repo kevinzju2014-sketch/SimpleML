@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SimpleML Icon Style — Choose A / B / C</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --ink: #1c1917;
+      --muted: #78716c;
+      --card: #fffdf8;
+      --line: #e7e5e4;
+      --accent: #0f766e;
+      --a: #292524;
+      --b1: #5f8f8a;
+      --b2: #c47865;
+      --b3: #7d9b6e;
+      --b4: #6b7c93;
+      --b5: #b8a48a;
+      --b6: #8a8f6e;
+      --cy: #e6b422;
+      --co: #e07a3d;
+      --cg: #4caf50;
+      --cgray: #6b7280;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #efe8d8 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #e4efe9 0%, transparent 50%),
+        var(--bg);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+    header { margin-bottom: 28px; }
+    .eyebrow {
+      font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600;
+    }
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 500; margin: 8px 0 10px; letter-spacing: -0.02em;
+    }
+    .lead { max-width: 62ch; color: var(--muted); font-size: 16px; margin: 0; }
+    .note {
+      margin-top: 16px; padding: 12px 14px; border: 1px solid var(--line);
+      background: #fff; border-radius: 10px; font-size: 14px; color: #44403c;
+    }
+    .board {
+      margin: 28px 0 10px; border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--line); background: #fff;
+      box-shadow: 0 10px 30px rgba(28,25,23,0.06);
+    }
+    .board img { display: block; width: 100%; height: auto; }
+    .grid {
+      display: grid; gap: 18px;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 22px;
+    }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 16px; padding: 18px 18px 16px;
+      box-shadow: 0 8px 24px rgba(28,25,23,0.04);
+      transition: border-color .15s, box-shadow .15s, transform .15s;
+      position: relative;
+    }
+    .card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(15,118,110,.2), 0 12px 28px rgba(28,25,23,.08);
+      transform: translateY(-2px);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 13px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .badge i {
+      width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center;
+      background: var(--ink); color: #fff; font-style: normal; font-size: 12px;
+    }
+    .card h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 24px; margin: 10px 0 6px; font-weight: 500;
+    }
+    .card p.desc { margin: 0 0 14px; color: var(--muted); font-size: 14px; min-height: 3.2em; }
+    .icons {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-bottom: 14px;
+    }
+    .cell { text-align: center; }
+    .cell span {
+      display: block; margin-top: 6px; font-size: 11px; color: var(--muted);
+    }
+    .ico {
+      width: 56px; height: 56px; margin: 0 auto; border-radius: 12px;
+      display: grid; place-items: center; position: relative;
+    }
+    svg { width: 28px; height: 28px; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* A */
+    .a .ico { background: #f5f5f4; border: 1px solid #d6d3d1; }
+    .a svg { stroke: var(--a); }
+
+    /* B */
+    .b .i1 { background: var(--b1); }
+    .b .i2 { background: var(--b2); }
+    .b .i3 { background: var(--b3); }
+    .b .i4 { background: var(--b4); }
+    .b .i5 { background: var(--b5); }
+    .b .i6 { background: var(--b6); }
+    .b .ico { box-shadow: 0 4px 10px rgba(0,0,0,.08); }
+    .b svg { stroke: #fff; }
+
+    /* C */
+    .c .i1 { background: var(--cy); }
+    .c .i2 { background: var(--co); }
+    .c .i3 { background: var(--cg); }
+    .c .i4, .c .i5, .c .i6 { background: var(--cgray); }
+    .c svg { stroke: #fff; stroke-width: 2; }
+
+    ul.pros {
+      margin: 0 0 14px; padding-left: 18px; color: #44403c; font-size: 13px;
+    }
+    ul.pros li { margin: 4px 0; }
+    .pick {
+      width: 100%; border: 0; border-radius: 10px; padding: 11px 14px;
+      background: var(--ink); color: #fff; font-weight: 600; cursor: pointer;
+      font-size: 14px;
+    }
+    .pick:hover { filter: brightness(1.08); }
+    .card.selected .pick { background: var(--accent); }
+    .footer-bar {
+      position: sticky; bottom: 12px; margin-top: 28px;
+      background: rgba(28,25,23,.92); color: #fff; border-radius: 14px;
+      padding: 14px 18px; display: flex; gap: 12px; align-items: center;
+      justify-content: space-between; flex-wrap: wrap;
+      backdrop-filter: blur(8px);
+    }
+    .footer-bar strong { font-size: 15px; }
+    .footer-bar .hint { font-size: 13px; opacity: .8; }
+    .copy {
+      border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff;
+      border-radius: 8px; padding: 8px 12px; cursor: pointer; font-weight: 600;
+    }
+    .ribbon {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .chip {
+      font-size: 12px; padding: 4px 8px; border-radius: 999px;
+      background: #f5f5f4; color: #57534e; border: 1px solid var(--line);
+    }
+    .c .chip-y { background: #fff7d6; }
+    .c .chip-o { background: #ffe8d6; }
+    .c .chip-g { background: #e5f6e6; }
+    .c .chip-x { background: #eceff3; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">SimpleML · Icon redesign</div>
+      <h1>选择一套图标风格</h1>
+      <p class="lead">
+        当前工具栏图标是彩色底 + 英文缩写（Pred / VizR / Smart），小尺寸发糊且不统一。
+        下面三套方案都去掉文字缩写，只用图形。点选一张方案后，把结果发给我即可开始重绘全套图标。
+      </p>
+      <div class="note">
+        <strong>怎么选：</strong>点卡片底部「选择方案 X」，或直接回复我 <code>A</code> / <code>B</code> / <code>C</code>。
+        选中后可复制一句话发给 Cursor。
+      </div>
+    </header>
+
+    <div class="board">
+      <img src="icon-proposals-board.png" alt="SimpleML icon style proposals A B C overview" />
+    </div>
+
+    <div class="grid">
+      <!-- A -->
+      <article class="card a" data-plan="A" id="card-A">
+        <div class="badge"><i>A</i> Line Glyph</div>
+        <h2>线描极简</h2>
+        <p class="desc">深灰线描 + 浅底圆角。像专业 CAD/GH 插件，安静、耐看，长期最稳。</p>
+        <div class="icons">
+          <div class="cell"><div class="ico i1"><svg viewBox="0 0 24 24"><path d="M4 12h12"/><path d="M12 6l6 6-6 6"/></svg></div><span>Predict</span></div>
+          <div class="cell"><div class="ico i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 5v2M12 17v2M5 12h2M17 12h2M7 7l1.4 1.4M15.6 15.6L17 17M17 7l-1.4 1.4M7 17l1.4-1.4"/></svg></div><span>Train</span></div>
+          <div class="cell"><div class="ico i3"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="2.2"/><circle cx="16" cy="9" r="2.2"/><circle cx="12" cy="16" r="2.2"/></svg></div><span>Cluster</span></div>
+          <div class="cell"><div class="ico i4"><svg viewBox="0 0 24 24"><path d="M4 18V6"/><path d="M4 18h16"/><path d="M7 14l3-3 3 2 4-5"/></svg></div><span>Evaluate</span></div>
+          <div class="cell"><div class="ico i5"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M4 10h16M10 5v14"/></svg></div><span>Dataset</span></div>
+          <div class="cell"><div class="ico i6"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="2"/><circle cx="14" cy="8" r="2"/><circle cx="15" cy="13" r="2"/><path d="M8 16c2 2 6 2 8 0"/></svg></div><span>Visualize</span></div>
+        </div>
+        <ul class="pros">
+          <li>最干净，印刷/深浅主题都清晰</li>
+          <li>不依赖颜色也能辨认功能</li>
+          <li>适合严肃教学与长期维护</li>
+        </ul>
+        <button class="pick" type="button" data-pick="A">选择方案 A</button>
+      </article>
+
+      <!-- B -->
+      <article class="card b" data-plan="B" id="card-B">
+        <div class="badge"><i>B</i> Soft Tile</div>
+        <h2>柔和色块</h2>
+        <p class="desc">低饱和色块 + 白色剪影。更友好、教学向，一眼活泼，但不花哨。</p>
+        <div class="icons">
+          <div class="cell"><div class="ico i1"><svg viewBox="0 0 24 24"><path d="M4 12h12"/><path d="M12 6l6 6-6 6"/></svg></div><span>Predict</span></div>
+          <div class="cell"><div class="ico i2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 5v2M12 17v2M5 12h2M17 12h2"/></svg></div><span>Train</span></div>
+          <div class="cell"><div class="ico i3"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="2.2"/><circle cx="16" cy="9" r="2.2"/><circle cx="12" cy="16" r="2.2"/></svg></div><span>Cluster</span></div>
+          <div class="cell"><div class="ico i4"><svg viewBox="0 0 24 24"><path d="M4 18V6"/><path d="M4 18h16"/><path d="M7 14l3-3 3 2 4-5"/></svg></div><span>Evaluate</span></div>
+          <div class="cell"><div class="ico i5"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M4 10h16M10 5v14"/></svg></div><span>Dataset</span></div>
+          <div class="cell"><div class="ico i6"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="2"/><circle cx="14" cy="8" r="2"/><circle cx="15" cy="13" r="2"/></svg></div><span>Visualize</span></div>
+        </div>
+        <ul class="pros">
+          <li>课堂演示更有亲和力</li>
+          <li>色相少、统一圆角，整体感强</li>
+          <li>颜色偏装饰，不严格对应任务类型</li>
+        </ul>
+        <button class="pick" type="button" data-pick="B">选择方案 B</button>
+      </article>
+
+      <!-- C -->
+      <article class="card c" data-plan="C" id="card-C">
+        <div class="badge"><i>C</i> Task Color</div>
+        <h2>任务色符号</h2>
+        <p class="desc">沿用你们已有习惯：黄=分类、橙=回归、绿=聚类、灰=工具。去掉缩写字，只留符号。</p>
+        <div class="ribbon">
+          <span class="chip chip-y">黄 · 分类</span>
+          <span class="chip chip-o">橙 · 回归</span>
+          <span class="chip chip-g">绿 · 聚类</span>
+          <span class="chip chip-x">灰 · 工具</span>
+        </div>
+        <div class="icons" style="margin-top:12px">
+          <div class="cell"><div class="ico i1"><svg viewBox="0 0 24 24"><path d="M4 12h12"/><path d="M12 6l6 6-6 6"/></svg></div><span>Clf / Pred</span></div>
+          <div class="cell"><div class="ico i2"><svg viewBox="0 0 24 24"><path d="M4 16l6-8 4 5 6-7"/></svg></div><span>Reg</span></div>
+          <div class="cell"><div class="ico i3"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="2.2"/><circle cx="16" cy="9" r="2.2"/><circle cx="12" cy="16" r="2.2"/></svg></div><span>Cluster</span></div>
+          <div class="cell"><div class="ico i4"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></div><span>Eval</span></div>
+          <div class="cell"><div class="ico i5"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M4 10h16"/></svg></div><span>Dataset</span></div>
+          <div class="cell"><div class="ico i6"><svg viewBox="0 0 24 24"><path d="M12 4v16M8 8h8M8 12h8M8 16h5"/></svg></div><span>Help</span></div>
+        </div>
+        <ul class="pros">
+          <li>迁移成本最低，和旧配色习惯一致</li>
+          <li>任务类型一眼可辨</li>
+          <li>比现在的文字色块更清晰、更统一</li>
+        </ul>
+        <button class="pick" type="button" data-pick="C">选择方案 C</button>
+      </article>
+    </div>
+
+    <div class="board" style="margin-top:28px">
+      <img src="icon-proposals-abc.png" alt="Earlier three-column icon comparison" />
+    </div>
+
+    <div class="footer-bar" id="status">
+      <div>
+        <strong id="choice">尚未选择</strong>
+        <div class="hint" id="hint">点上面「选择方案 A/B/C」，然后复制回复发给我。</div>
+      </div>
+      <button class="copy" type="button" id="copyBtn">复制选择结果</button>
+    </div>
+  </div>
+
+  <script>
+    const msgs = {
+      A: "我选择图标方案 A（Line Glyph / 线描极简）。请按该风格重绘全套 SimpleML 图标并重新编译安装。",
+      B: "我选择图标方案 B（Soft Tile / 柔和色块）。请按该风格重绘全套 SimpleML 图标并重新编译安装。",
+      C: "我选择图标方案 C（Task Color / 任务色符号）。请按该风格重绘全套 SimpleML 图标并重新编译安装。"
+    };
+    let selected = null;
+    function setChoice(plan) {
+      selected = plan;
+      document.querySelectorAll(".card").forEach(c => c.classList.toggle("selected", c.dataset.plan === plan));
+      document.getElementById("choice").textContent = "已选择方案 " + plan;
+      document.getElementById("hint").textContent = msgs[plan];
+      try { localStorage.setItem("simpleml-icon-plan", plan); } catch (e) {}
+    }
+    document.querySelectorAll("[data-pick]").forEach(btn => {
+      btn.addEventListener("click", () => setChoice(btn.dataset.pick));
+    });
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      if (!selected) { alert("请先选择 A / B / C"); return; }
+      const text = msgs[selected];
+      try {
+        await navigator.clipboard.writeText(text);
+        document.getElementById("copyBtn").textContent = "已复制";
+        setTimeout(() => document.getElementById("copyBtn").textContent = "复制选择结果", 1200);
+      } catch (e) {
+        prompt("复制下面这句话发给我：", text);
+      }
+    });
+    try {
+      const saved = localStorage.getItem("simpleml-icon-plan");
+      if (saved && msgs[saved]) setChoice(saved);
+    } catch (e) {}
+  </script>
+</body>
+</html>

@@ -1,79 +1,89 @@
-# SimpleML - Grasshopper机器学习插件
+# SimpleML
 
-基于 scikit-learn 的 Grasshopper 机器学习插件，提供完整的机器学习工作流程，包括分类、回归、聚类等功能。
+Grasshopper 机器学习插件（免费 / MIT）  
+基于 scikit-learn，面向设计师与教学场景。兼容 **Rhino 7+**（Windows / macOS）。
 
-## 快速开始
+**版本**: 1.2.0  
 
-1. **安装Python依赖**：
-   ```bash
-   pip install -r requirements.txt
-   ```
+开发目录约定（本机）：
 
-2. **在Grasshopper中使用**：
-   - 将myML文件夹复制到可访问的位置
-   - 在Python组件中添加路径：
-   ```python
-   import sys
-   sys.path.append(r'[myML文件夹路径]')
-   ```
+```text
+D:\Helio\250928_机器学习课程\
+```
+
+云端仓库与上述目录应保持同步（见 `sync_to_helio.bat`）。
+
+## 最终开发结构
+
+```text
+SimpleML/
+├── components/       # Python 组件 API
+├── core/             # ML 核心
+├── GHA_Project/      # C# Grasshopper 插件源码
+├── examples/         # 可用示例（配方 + 冒烟脚本）
+├── tests/            # 自动化测试
+├── docs/             # 用户手册 / 组件参考
+├── scripts/          # 构建脚本
+├── requirements.txt
+└── README.md
+```
+
+## Language (EN / ZH)
+
+Default: **English**.
+
+Use **SimpleML → 09 Help → Language**:
+
+- Boolean `Chinese`: `false` = English, `true` = Chinese  
+- Or **right-click** the component → `English` / `中文 Chinese`
+
+Canvas component names and explanation texts refresh automatically — **no Rhino restart**.
+
+Preference: `%APPDATA%\Grasshopper\SimpleML\language.txt`  
+Env: `SIMPLEML_LANG=en|zh`
+
+## 构建插件
+
+需本机安装 Rhino + .NET SDK：
+
+```bash
+dotnet build GHA_Project/SimpleML.csproj -c Release -p:RhinoMajorVersion=7
+# 无本机 Rhino 程序集时可用 NuGet：
+dotnet build GHA_Project/SimpleML.csproj -c Release -p:UseNuGetRhino=true
+```
+
+产物：`GHA_Project/bin/Release/SimpleML.gha`
+
+开发期可将 `.gha` 与本仓库根目录（含 `components/`、`core/`）放到 Grasshopper Libraries，或设置 `SIMPLEML_PATH` 指向本仓库根。
+
+## 测试
+
+```bash
+python -m pip install -r requirements.txt
+python tests/test_simpleml.py -v
+python examples/quickstart_all.py
+```
+
+## 可用示例
+
+| 文件 | 说明 | 状态 |
+|------|------|------|
+| `examples/01_classification_iris.md` | 鸢尾花分类配方 | 可用 |
+| `examples/02_clustering_color.md` | 聚类上色配方 | 可用 |
+| `examples/03_regression.md` | 回归配方 | 可用 |
+| `examples/quickstart_all.py` | 三任务 Python 冒烟 | 可用 |
 
 ## 文档
 
-- **README_SIMPLEML.md** - 完整的使用说明
-- **SIMPLEML_CATEGORIES.md** - 电池分类和使用指南
-- **SIMPLEML_GRASSHOPPER_SETUP.md** - Grasshopper设置指南
-- **COMPONENTS_EXPLANATION.md** - 组件详细说明
-- **WORKFLOW_DIAGRAM.md** - 工作流程图
-- **DATASET_GUIDE.md** - 数据集使用指南
-- **ALGORITHMS_GUIDE.md** - 算法使用指南
-- **LOAD_MODEL_GUIDE.md** - 模型加载指南
+- [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+- [docs/COMPONENT_REFERENCE.md](docs/COMPONENT_REFERENCE.md)
 
-## 项目结构
+## 与本机文件夹同步
 
-```
-myML/
-├── components/          # 组件代码
-│   ├── file_io_components.py
-│   ├── statistics_components.py
-│   ├── dataset_components.py
-│   ├── train_components.py
-│   ├── predict_components.py
-│   ├── evaluate_components.py
-│   └── algorithms/     # 算法特定组件
-├── core/               # 核心功能
-│   ├── ml_models.py
-│   ├── data_preprocessing.py
-│   └── model_io.py
-└── examples/           # 示例文件
-```
+在 Windows 上双击仓库中的 `sync_to_helio.bat`，会把当前分支同步到：
 
-## 功能特性
-
-- ✅ 数据输入（CSV、Excel）
-- ✅ 数据分析和统计
-- ✅ 数据预处理
-- ✅ 数据集管理
-- ✅ 模型训练（15种算法）
-- ✅ 模型预测
-- ✅ 模型评估
-- ✅ 模型保存和加载
-
-## 支持的算法
-
-### 分类
-- 随机森林、SVM、逻辑回归、KNN、决策树、朴素贝叶斯
-
-### 回归
-- 随机森林、SVR、线性回归、岭回归、Lasso、KNN
-
-### 聚类
-- K-Means、DBSCAN、层次聚类
+`D:\Helio\250928_机器学习课程\`
 
 ## 许可证
 
-MIT License
-
----
-
-**版本**: 1.0.0  
-**更新日期**: 2026年1月26日
+MIT

@@ -9,6 +9,7 @@ using Rhino.Display;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.Visualization
 {
     /// <summary>
@@ -22,8 +23,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public VisualizeRegressionComponent()
-          : base("Visualize Regression", "VizReg",
-              "显示预测值 vs 实际值散点图 + 拟合线",
+          : base(L.Name("VisualizeRegressionComponent"), L.Nick("VisualizeRegressionComponent"), L.Desc("VisualizeRegressionComponent"),
               "SimpleML", "08 Visualization")
         {
         }

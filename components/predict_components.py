@@ -14,27 +14,15 @@ if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
 # 确保Rhino Python的site-packages在路径中
+# 跨平台引导 Rhino / 系统 site-packages
 try:
-    site_packages = site.getsitepackages()
-    for sp in site_packages:
-        if sp not in sys.path:
-            sys.path.insert(0, sp)
-    
-    # 添加Rhino Python的site-envs虚拟环境路径
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
-    if os.path.exists(rhino_site_envs):
-        for item in os.listdir(rhino_site_envs):
-            env_path = os.path.join(rhino_site_envs, item)
-            if os.path.isdir(env_path):
-                if env_path not in sys.path:
-                    sys.path.insert(0, env_path)
-                site_pkg = os.path.join(env_path, 'Lib', 'site-packages')
-                if os.path.exists(site_pkg) and site_pkg not in sys.path:
-                    sys.path.insert(0, site_pkg)
+    from core.env_bootstrap import bootstrap_python_paths
+    bootstrap_python_paths(project_dir)
 except Exception:
     pass
 
 from core.ml_models import MLModelManager
+from core.model_bundle import unwrap_model
 from components.dataset_components import Dataset, deconstruct_dataset
 import numpy as np
 
@@ -62,12 +50,14 @@ def predict_classifier(model, X=None, dataset=None):
         raise ValueError("必须提供X或dataset参数")
     
     X = np.array(X)
+    inner = unwrap_model(model)
 
     # 兼容 Grasshopper 常见数据组织方式：
     # - 有时每个分支代表“一个特征列”，会导致 X 形状为 (n_features, n_samples)
     # - sklearn 期望 (n_samples, n_features)
-    if hasattr(model, 'n_features_in_') and len(X.shape) == 2:
-        expected_features = int(getattr(model, 'n_features_in_', X.shape[1]))
+    n_features_in = getattr(model, 'n_features_in_', None) or getattr(inner, 'n_features_in_', None)
+    if n_features_in is not None and len(X.shape) == 2:
+        expected_features = int(n_features_in)
         if X.shape[1] != expected_features and X.shape[0] == expected_features:
             X = X.T
 
@@ -78,19 +68,19 @@ def predict_classifier(model, X=None, dataset=None):
         except Exception:
             pass
     
-    # 进行预测
+    # 进行预测（SimpleMLModel 会自动套用预处理）
     predictions = model.predict(X)
     
     # 尝试获取预测概率（如果模型支持）
     probabilities = None
     prob_reason = ""
-    if hasattr(model, 'predict_proba'):
+    if hasattr(model, 'predict_proba') or hasattr(inner, 'predict_proba'):
         try:
             # 检查是否是 SVM 且未启用概率预测
-            model_type = type(model).__name__
+            model_type = type(inner).__name__
             if model_type == 'SVC':
                 # 检查 probability 属性（SVM 特有）
-                if hasattr(model, 'probability') and not model.probability:
+                if hasattr(inner, 'probability') and not inner.probability:
                     # SVM 未启用概率预测，返回空列表而不是 None
                     probabilities = []
                     prob_reason = "SVM模型未启用概率预测（训练时需要设置probability=True）"

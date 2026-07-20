@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SimpleML Icons · 浅灰底选型 L1–L5</title>
+  <style>
+    :root {
+      --ink: #222;
+      --muted: #666;
+      --canvas: #c8c8c8;
+      --toolbar: #e8e8e8;
+      --well: #d6d6d6;
+      --accent: #2f6f4e;
+      --line: #ccc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f3f3f3;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 18px 110px; }
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    h1 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 650; margin: 6px 0 8px; }
+    .lead { max-width: 72ch; color: var(--muted); margin: 0 0 16px; }
+    .fix {
+      background: #fff8e8; border: 1px solid #e6d39a; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 16px; font-size: 14px;
+    }
+    .fix li { margin: 4px 0; }
+    .board {
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+      background: #fff; margin-bottom: 18px;
+    }
+    .board img { display: block; width: 100%; height: auto; }
+    .jump {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px;
+    }
+    @media (max-width: 900px) { .jump { grid-template-columns: repeat(2, 1fr); } }
+    .jump button {
+      background: var(--toolbar); border: 2px solid transparent; border-radius: 10px;
+      padding: 8px; cursor: pointer; text-align: center;
+    }
+    .jump button.active { border-color: var(--accent); }
+    .jump .t { font-size: 12px; font-weight: 700; color: #333; }
+    .jump img { width: 100%; margin-top: 6px; image-rendering: pixelated; }
+    .card {
+      background: #fff; border: 2px solid var(--line); border-radius: 14px;
+      margin-bottom: 14px; overflow: hidden;
+    }
+    .card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47,111,78,.18); }
+    .head { padding: 14px 16px 8px; display: flex; justify-content: space-between; gap: 10px; }
+    .head h2 { margin: 0; font-size: 20px; }
+    .head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .tag { background: #eee; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; height: fit-content; }
+    .stage {
+      background: var(--toolbar);
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      padding: 14px;
+    }
+    .label { font-size: 12px; font-weight: 700; color: #555; margin: 0 0 8px; }
+    .zoom { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .cell { width: 76px; text-align: center; }
+    .well {
+      width: 76px; height: 76px; background: var(--well);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid #c0c0c0;
+    }
+    .well img { width: 48px; height: 48px; image-rendering: pixelated; }
+    .cap { font-size: 11px; color: #555; margin-top: 4px; }
+    .real {
+      background: var(--canvas); border-radius: 8px; padding: 8px 10px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      border: 1px solid #b5b5b5;
+    }
+    .real span { font-size: 11px; color: #444; margin-right: 4px; }
+    .real img { width: 24px; height: 24px; image-rendering: pixelated; }
+    .actions { padding: 12px 16px 16px; }
+    .pick {
+      width: 100%; border: 0; border-radius: 10px; padding: 12px;
+      background: #222; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
+    }
+    .card.selected .pick { background: var(--accent); }
+    .footer {
+      position: sticky; bottom: 10px;
+      background: rgba(30,30,30,.95); color: #fff; border-radius: 12px;
+      padding: 12px 16px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .hint { font-size: 13px; opacity: .85; }
+    .copy {
+      border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff;
+      border-radius: 8px; padding: 8px 12px; cursor: pointer; font-weight: 650;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Grasshopper light-grey UI · pixel-native 24×24</div>
+    <h1>浅灰底重新选型（L1–L5）</h1>
+    <p class="lead">
+      已纠正两点：① 预览改为 <strong>浅灰</strong>（贴近 GH，不是深灰）；
+      ② 图标按 <strong>24×24 像素原生块面</strong>绘制，不再「先高清再缩小」——避免脆弱碎点。
+      确认前仍不改插件。
+    </p>
+
+    <div class="fix">
+      <strong>设计逻辑</strong>
+      <ul>
+        <li>在 24px 网格上画大块形状（最小特征约 3–4px）</li>
+        <li>用 2–3 级色块做体积，不用多层柔光渐变</li>
+        <li>阴影用 1px 实心偏移，不用模糊产生杂点</li>
+        <li>评判环境：浅灰工具栏 / 画布灰</li>
+      </ul>
+    </div>
+
+    <div class="jump" id="jump"></div>
+    <div class="board"><img src="icon_choose_light_board.png" alt="All L1-L5 on light grey" /></div>
+    <div id="cards"></div>
+
+    <div class="footer">
+      <div>
+        <strong id="choice">尚未选择</strong>
+        <div class="hint" id="hint">在浅灰底上看真实 24px，再选 L1–L5。</div>
+      </div>
+      <button class="copy" type="button" id="copyBtn">复制选择结果</button>
+    </div>
+  </div>
+
+  <script>
+    const VERSIONS = {
+      L1: { title: "Official Vivid", note: "官方鲜艳块面，浅灰底对比清晰。" },
+      L2: { title: "Official Soft", note: "同块面语言，饱和略降。" },
+      L3: { title: "Max Clarity", note: "更深描边、更大块面，浅灰底最易认。" },
+      L4: { title: "Task Hue Blocks", note: "黄/橙/绿任务色在块面上。" },
+      L5: { title: "Gray + Accent", note: "灰块主体 + 大块彩色点缀。" }
+    };
+    const KEYS = ["data","train","predict","eval","cluster","split","line","smart"];
+    const LABELS = { data:"Data", train:"Train", predict:"Predict", eval:"Evaluate", cluster:"Cluster", split:"Split", line:"Regress", smart:"Smart" };
+    const msgs = {
+      L1: "我选择 L1（Official Vivid · 浅灰底）。请用像素原生块面工艺重绘全套图标并编译安装。",
+      L2: "我选择 L2（Official Soft · 浅灰底）。请用像素原生块面工艺重绘全套图标并编译安装。",
+      L3: "我选择 L3（Max Clarity · 浅灰底）。请用更高对比的像素原生块面重绘全套图标并编译安装。",
+      L4: "我选择 L4（Task Hue Blocks · 浅灰底）。请用任务色块面重绘全套图标并编译安装。",
+      L5: "我选择 L5（Gray + Accent · 浅灰底）。请用灰块+大块彩点缀重绘全套图标并编译安装。"
+    };
+
+    const jump = document.getElementById("jump");
+    Object.keys(VERSIONS).forEach(id => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.dataset.jump = id;
+      b.innerHTML = `<div class="t">${id} ${VERSIONS[id].title}</div><img src="icon_choose_light/${id}_24px.png" alt="" />`;
+      jump.appendChild(b);
+    });
+
+    const root = document.getElementById("cards");
+    Object.keys(VERSIONS).forEach(id => {
+      const v = VERSIONS[id];
+      const art = document.createElement("article");
+      art.className = "card";
+      art.id = "card-" + id;
+      art.dataset.plan = id;
+      art.innerHTML = `
+        <div class="head">
+          <div><h2>${id} · ${v.title}</h2><p>${v.note}</p></div>
+          <span class="tag">${id}</span>
+        </div>
+        <div class="stage">
+          <div class="label">浅灰工具栏 · 放大 ×2（像素原生，非高清缩小）</div>
+          <div class="zoom">
+            ${KEYS.map(k => `
+              <div class="cell">
+                <div class="well"><img src="icon_choose_light/${id}_${k}_toolbar.png" alt="" /></div>
+                <div class="cap">${LABELS[k]}</div>
+              </div>`).join("")}
+          </div>
+          <div class="real">
+            <span>画布浅灰 · 真实 24×24：</span>
+            ${KEYS.map(k => `<img src="icon_choose_light/${id}_${k}_canvas.png" alt="" />`).join("")}
+          </div>
+        </div>
+        <div class="actions"><button class="pick" type="button" data-pick="${id}">选择 ${id}</button></div>`;
+      root.appendChild(art);
+    });
+
+    let selected = null;
+    function setChoice(plan) {
+      selected = plan;
+      document.querySelectorAll(".card").forEach(c => c.classList.toggle("selected", c.dataset.plan === plan));
+      document.querySelectorAll("[data-jump]").forEach(b => b.classList.toggle("active", b.dataset.jump === plan));
+      document.getElementById("choice").textContent = "已选择 " + plan;
+      document.getElementById("hint").textContent = msgs[plan];
+      try { localStorage.setItem("simpleml-icon-l", plan); } catch (e) {}
+    }
+    document.addEventListener("click", e => {
+      const p = e.target.closest("[data-pick]");
+      if (p) setChoice(p.dataset.pick);
+      const j = e.target.closest("[data-jump]");
+      if (j) {
+        setChoice(j.dataset.jump);
+        document.getElementById("card-" + j.dataset.jump).scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+    document.getElementById("copyBtn").onclick = async () => {
+      if (!selected) return alert("请先选择 L1–L5");
+      try {
+        await navigator.clipboard.writeText(msgs[selected]);
+        document.getElementById("copyBtn").textContent = "已复制";
+        setTimeout(() => document.getElementById("copyBtn").textContent = "复制选择结果", 1200);
+      } catch (e) { prompt("复制发给我：", msgs[selected]); }
+    };
+    try {
+      const s = localStorage.getItem("simpleml-icon-l");
+      if (s && msgs[s]) setChoice(s);
+    } catch (e) {}
+  </script>
+</body>
+</html>

@@ -9,6 +9,7 @@ using Rhino.Display;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.Visualization
 {
     /// <summary>
@@ -22,8 +23,7 @@ namespace SimpleML.Components.Visualization
         private bool _hidden = false;
 
         public VisualizeClusterLabelsComponent()
-          : base("Visualize Cluster Labels", "VizClust",
-              "根据聚类标签给几何对象着色预览",
+          : base(L.Name("VisualizeClusterLabelsComponent"), L.Nick("VisualizeClusterLabelsComponent"), L.Desc("VisualizeClusterLabelsComponent"),
               "SimpleML", "08 Visualization")
         {
         }

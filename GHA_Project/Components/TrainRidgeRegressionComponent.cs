@@ -4,18 +4,18 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelTraining
 {
     public class TrainRidgeRegressionComponent : GH_Component
     {
         public TrainRidgeRegressionComponent()
-          : base("Ridge Regression", "Ridge",
-              "训练岭回归器",
+          : base(L.Name("TrainRidgeRegressionComponent"), L.Nick("TrainRidgeRegressionComponent"), L.Desc("TrainRidgeRegressionComponent"),
               "SimpleML", "05 Algorithm")
         {
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.quarternary;
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
@@ -85,7 +85,7 @@ namespace SimpleML.Components.ModelTraining
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }

@@ -7,13 +7,15 @@ using Grasshopper.Kernel;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.DatasetManagement
 {
     public class CreateDatasetComponent : GH_Component
     {
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
+
         public CreateDatasetComponent()
-          : base("Create Dataset", "CreateDS",
-              "创建数据集对象，封装特征数据和标签",
+          : base(L.Name("CreateDatasetComponent"), L.Nick("CreateDatasetComponent"), L.Desc("CreateDatasetComponent"),
               "SimpleML", "03 Dataset")
         {
         }
@@ -223,7 +225,7 @@ namespace SimpleML.Components.DatasetManagement
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -281,7 +283,7 @@ try:
         if sp not in sys.path:
             sys.path.insert(0, sp)
     
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
+    rhino_site_envs = str(next((p for root in [__import__('pathlib').Path.home()/'.rhinocode', __import__('pathlib').Path.home()/'Library'/'Application Support'/'McNeel'/'Rhinoceros'/'.rhinocode'] if root.exists() for p in root.glob('py*-rh*/site-envs') if p.is_dir()), __import__('pathlib').Path.home()/'.rhinocode'/'site-envs'))
     if os.path.exists(rhino_site_envs):
         for item in os.listdir(rhino_site_envs):
             env_path = os.path.join(rhino_site_envs, item)
@@ -343,13 +345,23 @@ else:
 # 创建数据集 - 确保正确处理None值
 try:
     dataset = create_dataset(X_processed, labels_processed, X_names=X_names, y_names=y_names)
+    # 将已拟合预处理器打包进 Dataset，供训练/预测复用
+    if normalize_bool or handle_missing_bool:
+        dataset.set_preprocessor(preprocessor, {{
+            'normalize': normalize_bool,
+            'normalize_method': r'{escapedNormalizeMethod}',
+            'handle_missing': handle_missing_bool,
+            'missing_strategy': r'{escapedMissingStrategy}',
+            'remove_outliers': remove_outliers_bool,
+        }})
     
     # 获取数据集信息
     normalize_str = '是' if normalize_bool else '否'
     missing_str = '是' if handle_missing_bool else '否'
     outlier_str = '是' if remove_outliers_bool else '否'
     has_labels = '有' if dataset.y is not None else '无'
-    info = f'数据集shape: {{dataset.X.shape}}, 标签: {{has_labels}}, 标准化: {{normalize_str}}, 处理缺失值: {{missing_str}}, 移除异常值: {{outlier_str}}'
+    packed = '是' if getattr(dataset, 'preprocessor', None) is not None else '否'
+    info = f'数据集shape: {{dataset.X.shape}}, 标签: {{has_labels}}, 标准化: {{normalize_str}}, 处理缺失值: {{missing_str}}, 移除异常值: {{outlier_str}}, 预处理已打包: {{packed}}'
     
     # 返回数据集对象（序列化）
     dataset_bytes = pickle.dumps(dataset)
@@ -435,7 +447,7 @@ except Exception as e:
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }
@@ -474,23 +486,7 @@ except Exception as e:
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string ExtractValue(string output, string prefix)

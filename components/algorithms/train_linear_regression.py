@@ -16,23 +16,10 @@ project_dir = os.path.dirname(components_dir)
 if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
-# 确保Rhino Python的site-packages在路径中
+# 跨平台引导
 try:
-    site_packages = site.getsitepackages()
-    for sp in site_packages:
-        if sp not in sys.path:
-            sys.path.insert(0, sp)
-    
-    rhino_site_envs = r'C:\Users\Administrator\.rhinocode\py39-rh8\site-envs'
-    if os.path.exists(rhino_site_envs):
-        for item in os.listdir(rhino_site_envs):
-            env_path = os.path.join(rhino_site_envs, item)
-            if os.path.isdir(env_path):
-                if env_path not in sys.path:
-                    sys.path.insert(0, env_path)
-                site_pkg = os.path.join(env_path, 'Lib', 'site-packages')
-                if os.path.exists(site_pkg) and site_pkg not in sys.path:
-                    sys.path.insert(0, site_pkg)
+    from core.env_bootstrap import bootstrap_python_paths
+    bootstrap_python_paths(project_dir)
 except Exception:
     pass
 
@@ -52,13 +39,14 @@ def train_linear_regression(fit_intercept=True, normalize=False,
         algorithm_params: 本次配置的参数字典（JSON格式），连接到通用训练组件的Algorithm输入
         readme: 算法说明
     """
-    # 构建参数字典
+    # 构建参数字典（normalize 已弃用，默认不写入）
     params = {
         'algorithm': 'linear_regression',
         'fit_intercept': bool(fit_intercept),
-        'normalize': bool(normalize),
         'copy_X': bool(copy_X)
     }
+    if normalize:
+        params['normalize'] = True
     
     if n_jobs is not None:
         params['n_jobs'] = int(n_jobs)

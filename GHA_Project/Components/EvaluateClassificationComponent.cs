@@ -7,14 +7,14 @@ using Grasshopper.Kernel.Types;
 using SimpleML.Core;
 using Rhino;
 
+using SimpleML.Localization;
 namespace SimpleML.Components.ModelEvaluation
 {
     public class EvaluateClassificationComponent : GH_Component
     {
         public EvaluateClassificationComponent()
-          : base("Evaluate Classification", "EvalClf",
-              "评估分类模型",
-              "SimpleML", "06 Prediction")
+          : base(L.Name("EvaluateClassificationComponent"), L.Nick("EvaluateClassificationComponent"), L.Desc("EvaluateClassificationComponent"),
+              "SimpleML", "07 Evaluation")
         {
         }
 
@@ -29,10 +29,10 @@ namespace SimpleML.Components.ModelEvaluation
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Metrics", "M", "评估指标（Tree结构，每个分支包含指标名称和值）", GH_ParamAccess.tree);
-            pManager.AddTextParameter("Report", "R", "详细的评估报告", GH_ParamAccess.item);
+            pManager.AddTextParameter("Report", "Rep", "详细的评估报告", GH_ParamAccess.item);
             pManager.AddGenericParameter("Confusion Matrix", "CM", "混淆矩阵（Tree结构）", GH_ParamAccess.tree);
             pManager.AddGenericParameter("Predictions", "P", "预测结果（Tree结构，每个分支包含一个预测类别）", GH_ParamAccess.tree);
-            pManager.AddTextParameter("Readme", "R", "组件使用说明", GH_ParamAccess.item);
+            pManager.AddTextParameter("Readme", "RM", "组件使用说明", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -43,7 +43,7 @@ namespace SimpleML.Components.ModelEvaluation
             if (!DA.GetData(0, ref modelObj)) return;
             if (!DA.GetData(1, ref datasetObj))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "必须提供Test Dataset输入");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.need_test_dataset"));
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace SimpleML.Components.ModelEvaluation
                 if (string.IsNullOrEmpty(mymlPath))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, 
-                        "未找到myML文件夹。请设置SIMPLEML_PATH环境变量。");
+                        L.T("err.package_missing"));
                     return;
                 }
 
@@ -86,7 +86,7 @@ namespace SimpleML.Components.ModelEvaluation
                 pythonCodeBuilder.AppendLine("        if sp not in sys.path:");
                 pythonCodeBuilder.AppendLine("            sys.path.insert(0, sp)");
                 pythonCodeBuilder.AppendLine("    ");
-                pythonCodeBuilder.AppendLine("    rhino_site_envs = r'C:\\Users\\Administrator\\.rhinocode\\py39-rh8\\site-envs'");
+                pythonCodeBuilder.AppendLine("    rhino_site_envs = str(next((p for root in [__import__('pathlib').Path.home()/'.rhinocode', __import__('pathlib').Path.home()/'Library'/'Application Support'/'McNeel'/'Rhinoceros'/'.rhinocode'] if root.exists() for p in root.glob('py*-rh*/site-envs') if p.is_dir()), __import__('pathlib').Path.home()/'.rhinocode'/'site-envs'))");
                 pythonCodeBuilder.AppendLine("    if os.path.exists(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("        for item in os.listdir(rhino_site_envs):");
                 pythonCodeBuilder.AppendLine("            env_path = os.path.join(rhino_site_envs, item)");
@@ -377,30 +377,14 @@ Train Classifier (Model B) → Evaluate Classification → Metrics B
             }
             catch (Exception ex)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"执行失败: {ex.Message}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, L.T("err.exec_failed", ex.Message));
                 RhinoApp.WriteLine($"SimpleML错误: {ex}");
             }
         }
 
         private string GetMyMLPath()
         {
-            string envPath = Environment.GetEnvironmentVariable("SIMPLEML_PATH");
-            if (!string.IsNullOrEmpty(envPath) && Directory.Exists(envPath))
-                return envPath;
-
-            string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Grasshopper", "UserObjects", "SimpleML", "myML");
-            if (Directory.Exists(defaultPath))
-                return defaultPath;
-
-            string ghaPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string ghaDir = Path.GetDirectoryName(ghaPath);
-            string relativePath = Path.Combine(ghaDir, "myML");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            return null;
+            return PathResolver.GetMyMLPath();
         }
 
         private string ConvertTreeToPythonList(Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> tree)
